@@ -4,40 +4,43 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <memory>
 
 class FileParser
 {
 public:
+	typedef std::shared_ptr<std::map<std::string, int> >  HistPtr;
+	typedef std::shared_ptr<const std::map<std::string, int> >  const_HistPtr;
+	
     FileParser();
 	FileParser(std::string filename);
     virtual ~FileParser();
 
-	void clearHist(){ m_hist->clear(); }
+	void clearHist(){ mpHist->clear(); }
 	void reloadFile(){ resetState(); }
-	std::map<std::string, int>* getHist(); // get a copy of the current histogram
-	void hist(int cnt); // continue generating histogram of the next cnt words 
+	const_HistPtr getHist() const{ return mpHist; }
+	const_HistPtr hist(int cnt); // continue generating histogram of the next cnt words 
 	int wordCounted(); // the number of words that have been counted
+	int distinctWordCounted() { return mpHist->size(); }
 
 	// Test the whole file
-	std::map<std::string, int>* hist(); // histogram of all words 
+	const_HistPtr hist(); // histogram of all words
 	int distinctWordCount(); // total number of distinct words
 	int wordCount(); // total number of words
 	void wordRepeat(); // repeart the file wordwise
 	
 private:
-	std::ifstream* m_file;
-	std::map<std::string, int>* m_hist;
+	std::ifstream* mpFile;
+	HistPtr mpHist;
 
 	virtual std::string stdString(std::string word); // standarderize the input word 
 	
-	// process the state inside m_file
+	// process the state inside the ifstream mpFile
 	void saveState();
 	void resetState();
 	void loadState();
-	std::ios::iostate* m_state;
-	std::streampos* m_pos;
-	// initialize the varibles
-	void init();
+	std::unique_ptr<std::ios::iostate> mpState;
+	std::unique_ptr<std::streampos> mpPos;
 };
 
 

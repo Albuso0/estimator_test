@@ -3,25 +3,22 @@
 #include <set>
 #include "fileparser.h"
 
-
 std::string FileParser::stdString(std::string word)
 {
 	return word;
 }
 
-
-
-void FileParser::hist(int cnt)
+FileParser::const_HistPtr FileParser::hist(int cnt)
 {
 	std::string word;
 	for ( int i = 0; i < cnt;  ++i )
 	{
-		if ( (*m_file) >> word )
+		if ( (*mpFile) >> word )
 		{
 			word = stdString(word);
-			std::map<std::string,int>::iterator it = m_hist->find( word );
-			if ( it == m_hist->end() )
-				m_hist->insert( std::pair<std::string,int>( word,1 ) );
+			std::map<std::string,int>::iterator it = mpHist->find( word );
+			if ( it == mpHist->end() )
+				mpHist->insert( std::pair<std::string,int>( word,1 ) );
 			else
 				++(it->second);
 		}
@@ -30,40 +27,42 @@ void FileParser::hist(int cnt)
 			break;
 		}
 	}
+	return mpHist;
 }
 
 int FileParser::wordCounted()
 {
 	int sum = 0;
-	for ( std::map<std::string,int>::iterator it = m_hist->begin(); it != m_hist->end(); ++it )
+	for ( std::map<std::string,int>::iterator it = mpHist->begin(); it != mpHist->end(); ++it )
 		sum += it->second;
 	return sum;
 }
 
-std::map<std::string, int>* FileParser::hist()
+
+FileParser::const_HistPtr FileParser::hist()
 {
 	saveState();
 	resetState();
-	std::map<std::string, int>* t_hist = new std::map<std::string, int>;
-	std::istream_iterator<std::string> in(*m_file), end;
+	FileParser::HistPtr pCompleteHist ( new std::map<std::string, int> );
+	std::istream_iterator<std::string> in(*mpFile), end;
 	for (; in != end; ++in)
 	{
 		std::string word = stdString(*in);
-		std::map<std::string,int>::iterator it = t_hist->find( word );
-		if ( it == t_hist->end() )
-			t_hist->insert( std::pair<std::string,int>( word,1 ) );
+		std::map<std::string,int>::iterator it = pCompleteHist->find( word );
+		if ( it == pCompleteHist->end() )
+			pCompleteHist->insert( std::pair<std::string,int>( word,1 ) );
 		else
 			++(it->second);
 	}
 	loadState();
-	return t_hist;
+	return pCompleteHist;
 }
 
 int FileParser::distinctWordCount()
 {
 	saveState();
 	resetState();
-	std::istream_iterator<std::string> in(*m_file), end;
+	std::istream_iterator<std::string> in(*mpFile), end;
 	std::set<std::string> words;
 	for (; in != end; ++in)
 	{
@@ -72,16 +71,11 @@ int FileParser::distinctWordCount()
 	loadState();
 	return words.size();
 }
-
-
-
-
-
 int FileParser::wordCount()
 {
 	saveState();
 	resetState();
-	std::istream_iterator<std::string> in(*m_file), end;
+	std::istream_iterator<std::string> in(*mpFile), end;
 	int count = std::distance(in, end);
 	loadState();
 	return count;
@@ -90,13 +84,12 @@ void FileParser::wordRepeat()
 {
 	saveState();
 	resetState();
-	std::istream_iterator<std::string> in(*m_file), end;
+	std::istream_iterator<std::string> in(*mpFile), end;
 	for (; in != end; ++in)
 	{
 		std::cout << *in<<" ";
 	}
 	std::cout << std::endl;
-	
 	loadState();
 }
 
@@ -104,46 +97,35 @@ void FileParser::wordRepeat()
 
 void FileParser::saveState()
 {
-	*m_state = m_file->rdstate();
-	*m_pos = m_file->tellg();
+	*mpState = mpFile->rdstate();
+	*mpPos = mpFile->tellg();
 }
 void FileParser::resetState()
 {
-	m_file->clear();
-	m_file->seekg(0);
+	mpFile->clear();
+	mpFile->seekg(0);
 }
 void FileParser::loadState()
 {
-	m_file->seekg(*m_pos);
-	m_file->setstate(*m_state);
-}
-
-
-FileParser::FileParser(std::string filename)
-{
-	init();
-	m_file->open( filename.c_str() );
+	mpFile->seekg(*mpPos);
+	mpFile->setstate(*mpState);
 }
 
 FileParser::FileParser()
+	:mpFile(new std::ifstream),
+	 mpHist(new std::map<std::string, int>),
+	 mpState(new std::ios::iostate),
+	 mpPos(new std::streampos)
+{}
+
+FileParser::FileParser(std::string filename)
+	:FileParser()
 {
-	init();
+	mpFile->open( filename.c_str() );
 }
-void FileParser::init()
-{
-	m_file = new std::ifstream;
-	m_hist = new std::map<std::string, int>;
-	m_state = new std::ios::iostate;
-	m_pos= new std::streampos;
-}
+
 FileParser::~FileParser()
 {
-	m_file->close();
+	mpFile->close();
 }
 
-
-std::map<std::string, int>* FileParser::getHist()
-{
-	std::map<std::string, int>* t_hist = new std::map<std::string, int>(*m_hist); // a copy of m_hist
-	return t_hist;
-}
