@@ -36,8 +36,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = fileparser.cpp	main.cpp	support.cpp  ## TODO: add all .cpp files here
-OBJECTS       = fileparser.o	main.o		support.o ## TODO: add all corresponding .o files here
+SOURCES       = fileparser.cpp	main.cpp	support.cpp		chebmore.cpp ## TODO: add all .cpp files here
+OBJECTS       = fileparser.o	main.o		support.o		chebmore.o ## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -97,7 +97,10 @@ fileparser.o: fileparser.cpp fileparser.h
 main.o: main.cpp fileparser.h support.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-support.o: support.cpp support.h
+support.o: support.cpp support.h chebmore.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
+
+chebmore.o: chebmore.cpp chebmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
 
 

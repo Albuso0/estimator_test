@@ -8,7 +8,7 @@ std::string FileParser::stdString(std::string word)
 	return word;
 }
 
-FileParser::const_HistPtr FileParser::hist(int cnt)
+FileParser::const_HistPtr FileParser::incHist(int cnt)
 {
 	std::string word;
 	for ( int i = 0; i < cnt;  ++i )

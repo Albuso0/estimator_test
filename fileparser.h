@@ -19,7 +19,7 @@ public:
 	void clearHist(){ mpHist->clear(); }
 	void reloadFile(){ resetState(); }
 	const_HistPtr getHist() const{ return mpHist; }
-	const_HistPtr hist(int cnt); // continue generating histogram of the next cnt words 
+	const_HistPtr incHist(int cnt); // incremental histogram by counting the next cnt words 
 	int wordCounted(); // the number of words that have been counted
 	int distinctWordCounted() { return mpHist->size(); }
 
