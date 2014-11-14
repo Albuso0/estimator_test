@@ -1,17 +1,17 @@
 #include <iostream>
 #include <iterator>
 #include <set>
-#include "fileparser.h"
+#include "filereader.h"
 
-std::string FileParser::stdString(std::string word)
+std::string FileReader::stdString(std::string word)
 {
 	return word;
 }
 
-FileParser::const_HistPtr FileParser::incHist(int cnt)
+FileReader::const_HistPtr FileReader::read(int N)
 {
 	std::string word;
-	for ( int i = 0; i < cnt;  ++i )
+	for ( int i = 0; i < N;  ++i )
 	{
 		if ( (*mpFile) >> word )
 		{
@@ -30,7 +30,7 @@ FileParser::const_HistPtr FileParser::incHist(int cnt)
 	return mpHist;
 }
 
-int FileParser::wordCounted()
+int FileReader::wordN()
 {
 	int sum = 0;
 	for ( std::map<std::string,int>::iterator it = mpHist->begin(); it != mpHist->end(); ++it )
@@ -39,11 +39,11 @@ int FileParser::wordCounted()
 }
 
 
-FileParser::const_HistPtr FileParser::hist()
+FileReader::const_HistPtr FileReader::hist()
 {
 	saveState();
 	resetState();
-	FileParser::HistPtr pCompleteHist ( new std::map<std::string, int> );
+	FileReader::HistPtr pCompleteHist ( new std::map<std::string, int> );
 	std::istream_iterator<std::string> in(*mpFile), end;
 	for (; in != end; ++in)
 	{
@@ -58,7 +58,7 @@ FileParser::const_HistPtr FileParser::hist()
 	return pCompleteHist;
 }
 
-int FileParser::distinctWordCount()
+int FileReader::distinctTotal()
 {
 	saveState();
 	resetState();
@@ -71,7 +71,7 @@ int FileParser::distinctWordCount()
 	loadState();
 	return words.size();
 }
-int FileParser::wordCount()
+int FileReader::wordTotal()
 {
 	saveState();
 	resetState();
@@ -80,7 +80,7 @@ int FileParser::wordCount()
 	loadState();
 	return count;
 }
-void FileParser::wordRepeat()
+void FileReader::wordRepeat()
 {
 	saveState();
 	resetState();
@@ -95,36 +95,36 @@ void FileParser::wordRepeat()
 
 
 
-void FileParser::saveState()
+void FileReader::saveState()
 {
 	*mpState = mpFile->rdstate();
 	*mpPos = mpFile->tellg();
 }
-void FileParser::resetState()
+void FileReader::resetState()
 {
 	mpFile->clear();
 	mpFile->seekg(0);
 }
-void FileParser::loadState()
+void FileReader::loadState()
 {
 	mpFile->seekg(*mpPos);
 	mpFile->setstate(*mpState);
 }
 
-FileParser::FileParser()
+FileReader::FileReader()
 	:mpFile(new std::ifstream),
 	 mpHist(new std::map<std::string, int>),
 	 mpState(new std::ios::iostate),
 	 mpPos(new std::streampos)
 {}
 
-FileParser::FileParser(std::string filename)
-	:FileParser()
+FileReader::FileReader(std::string filename)
+	:FileReader()
 {
 	mpFile->open( filename.c_str() );
 }
 
-FileParser::~FileParser()
+FileReader::~FileReader()
 {
 	mpFile->close();
 }

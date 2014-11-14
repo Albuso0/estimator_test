@@ -2,3 +2,6 @@
 *.txt
 support
 *qmake
+*.png
+*.pdf
+*.plt

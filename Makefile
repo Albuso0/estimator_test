@@ -36,8 +36,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = fileparser.cpp	main.cpp	support.cpp		chebmore.cpp ## TODO: add all .cpp files here
-OBJECTS       = fileparser.o	main.o		support.o		chebmore.o ## TODO: add all corresponding .o files here
+SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp ## TODO: add all .cpp files here
+OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o ## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -91,10 +91,10 @@ compiler_clean:
 
 # TODO: add all dependencies for the .o
 
-fileparser.o: fileparser.cpp fileparser.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileparser.o fileparser.cpp
+filereader.o: filereader.cpp filereader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-main.o: main.cpp fileparser.h support.h
+main.o: main.cpp filereader.h support.h fileofflinereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 support.o: support.cpp support.h chebmore.h
@@ -102,5 +102,8 @@ support.o: support.cpp support.h chebmore.h
 
 chebmore.o: chebmore.cpp chebmore.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
+
+fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
 
 

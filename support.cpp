@@ -17,7 +17,27 @@ double Support<T>::estimate()
 template <typename T>
 double Support<T>::estimate_poly()
 {
-	return 0;
+	std::map<int, int> HistHist;
+	for ( typename std::map<T,int>::const_iterator it = mpHist->begin(); it != mpHist->end(); ++it )
+	{
+		int freq = it->second;
+		std::map<int,int>::iterator iter = HistHist.find( freq );
+		if ( iter == HistHist.end() )
+			HistHist.insert( std::pair<int,int>( freq,1 ) );
+		else
+			++(iter->second);
+	}
+	double result = 0.0;
+	for ( std::map<int,int>::iterator it = HistHist.begin(); it != HistHist.end(); ++it )
+		if ( it->first < 0.5 * log(k) ) // const!!!
+		{
+			result += getCoeff(it->first) * it->second;
+		}
+		else
+		{
+			result += it->second;
+		}
+	return result;
 }
 
 
@@ -56,7 +76,7 @@ void Support<T>::updateArr()
 	a[0] += 1;
 	a[0] = 0;
 
-	for ( int i = 0; i <= L; i++ ) std::cout<<a[i]<<std::endl;
+	// for ( int i = 0; i <= L; i++ ) std::cout<<a[i]<<std::endl;
 }
 
 template <typename T>
