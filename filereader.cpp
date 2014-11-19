@@ -2,9 +2,12 @@
 #include <iterator>
 #include <set>
 #include "filereader.h"
+#include "stringop.h"
 
 std::string FileReader::stdString(std::string word)
 {
+	StringOp::removepunc(word);
+	StringOp::tolower(word);
 	return word;
 }
 
@@ -16,11 +19,7 @@ FileReader::const_HistPtr FileReader::read(int N)
 		if ( (*mpFile) >> word )
 		{
 			word = stdString(word);
-			std::map<std::string,int>::iterator it = mpHist->find( word );
-			if ( it == mpHist->end() )
-				mpHist->insert( std::pair<std::string,int>( word,1 ) );
-			else
-				++(it->second);
+			addWord(word);
 		}
 		else
 		{
@@ -28,6 +27,14 @@ FileReader::const_HistPtr FileReader::read(int N)
 		}
 	}
 	return mpHist;
+}
+void FileReader::addWord(std::string word)
+{
+	std::map<std::string,int>::iterator it = mpHist->find( word );
+	if ( it == mpHist->end() )
+		mpHist->insert( std::pair<std::string,int>( word,1 ) );
+	else
+		++(it->second);
 }
 
 int FileReader::wordN()

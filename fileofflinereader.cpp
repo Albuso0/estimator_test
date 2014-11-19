@@ -37,6 +37,24 @@ FileOfflineReader::const_HistPtr FileOfflineReader::read(int N)
 	}
 	return mpHist;	
 }
+FileOfflineReader::const_HistPtr FileOfflineReader::read( const std::vector<int> &PosVec )
+{
+	for ( unsigned i = 0; i < PosVec.size();  ++i )
+	{
+		if ( ( PosVec[i] < 0 ) || ( PosVec[i] >= wordT ) )
+		{
+			continue;
+		}
+		else 
+		{
+			std::string word = stdString(words[PosVec[i]]);
+			addWord(word);
+			++pos;
+		}
+	}
+	return mpHist;
+}
+
 void FileOfflineReader::addWord(std::string word)
 {
 	std::map<std::string,int>::iterator it = mpHist->find( word );

@@ -36,8 +36,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp ## TODO: add all .cpp files here
-OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o ## TODO: add all corresponding .o files here
+SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	## TODO: add all .cpp files here
+OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -105,5 +105,8 @@ chebmore.o: chebmore.cpp chebmore.h
 
 fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
+
+stringop.o: stringop.cpp stringop.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
 
 
