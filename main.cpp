@@ -9,17 +9,17 @@ int main(int argc, char *argv[])
 {
 	FileReader fr("Shakespeare.txt");
 	int wordT = fr.wordTotal();
-	fr.reset();
 	FileReader::const_HistPtr Hist = fr.read(wordT);
 	int distinctT = Hist->size();
 	std::cout<<wordT<<"\t"<<distinctT<<std::endl;
 	
-	Support<std::string> support(32000);
+	Support<std::string> support(1000000);
 	support.setCN(0.7); // Plug-in if N_i >= c_N * log(k)
 	support.setCP(1.0); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
 	support.setCL(1.1); // L = c_L * log(k)
 
-	fr.reset();
+	support.setHist( Hist );
+	std::cout<<wordT<<"\t"<<distinctT<<"\t"<<support.estimate()<<"\t"<<support.estimate_plug()<<std::endl;
 	
 	
 	

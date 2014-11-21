@@ -41,12 +41,11 @@ private:
 	std::string stdString(std::string word); // standarderize the input word 
 	
 	// process the state inside the ifstream mpFile
-	// BUG: those internal steps does not work!!!!
 	void saveState();
 	void resetState();
 	void loadState();
-	std::unique_ptr<std::ios::iostate> mpState;
-	std::unique_ptr<std::streampos> mpPos;
+	int fState;
+	int fPos;
 };
 
 

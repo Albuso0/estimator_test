@@ -85,6 +85,7 @@ int FileReader::wordTotal()
 	std::istream_iterator<std::string> in(*mpFile), end;
 	int count = std::distance(in, end);
 	loadState();
+	
 	return count;
 }
 void FileReader::wordRepeat()
@@ -104,8 +105,8 @@ void FileReader::wordRepeat()
 
 void FileReader::saveState()
 {
-	*mpState = mpFile->rdstate();
-	*mpPos = mpFile->tellg();
+	fState = mpFile->rdstate();
+	fPos = mpFile->tellg();
 }
 void FileReader::resetState()
 {
@@ -114,15 +115,13 @@ void FileReader::resetState()
 }
 void FileReader::loadState()
 {
-	mpFile->seekg(*mpPos);
-	mpFile->setstate(*mpState);
+	mpFile->clear( (std::ios_base::iostate)fState );
+	mpFile->seekg(fPos);
 }
 
 FileReader::FileReader()
 	:mpFile(new std::ifstream),
-	 mpHist(new std::map<std::string, int>),
-	 mpState(new std::ios::iostate),
-	 mpPos(new std::streampos)
+	 mpHist(new std::map<std::string, int>)
 {}
 
 FileReader::FileReader(std::string filename)
