@@ -20,48 +20,30 @@ int main(int argc, char *argv[])
 	gen.setSeed( 0 );
 	
 	/* ----------------------UNIFORM---------------------------- */
-	// int k = 1000000;
-	// int truth = k;
-	// int pmin_inv = k;
+	int k = 1000000;
+	int truth = k;
+	int pmin_inv = k;
 	/* ----------------------END UNIFORM---------------------------- */
-
-
-	/* ----------------------EMPERICAL NEGATIVE BINOMIAL---------------------------- */
-	// SampleGen emp;
-	// emp.reset();
-	// emp.setSeed( 0 );
-	// int k = 1000000;
-	// emp.negative_binomial( k, 4, 0.04 );
-	// SampleGen::const_HistPtr hist = emp.getHist();
-	// int truth = hist->size();
-	// std::vector<double> p( truth );
-	// int cnt = 0;
-	// for ( std::map<int,int>::const_iterator it = hist->begin(); it != hist->end(); ++it )
-	// {
-	// 	p[cnt] = it->second;
-	// 	++cnt;
-	// }
-	// int pmin_inv = k;
-	/* ----------------------END EMPERICAL NEGATIVE BINOMIAL---------------------------- */
-
-	
-	/* ----------------------TRUNCATED POISSON---------------------------- */
-	// gen.Poisson_truncated( 300, l, 0 , 200 );
-	// Support<int> support(int(exp(10)));
-	// std::cout<<"Truth: "<< 20 << std::endl;
-	/* ----------------------END TRUNCATED POISSON---------------------------- */
 
 	
 	/* ----------------------DISCRETE---------------------------- */
-	int k = 1000000;
-	std::vector<double> p( k );
-	p[0] = 0.5;
-	for (int i = 1; i < k; i++)
-		p[i] = 0.5 / (k-1);
-	int truth = k;
-	int pmin_inv = 2*(k-1);
+	// int k = 1000000;
+	// std::vector<double> p( k );
+	// p[0] = 0.5;
+	// for (int i = 1; i < k; i++)
+	// 	p[i] = 0.5 / (k-1);
+	// int truth = k;
+	// int pmin_inv = 2*(k-1);
 	/* ----------------------END DISCRETE---------------------------- */
 
+	
+	/* ----------------------HAMLET---------------------------- */
+	// FileOfflineReader f("hamlet.txt");
+	// f.reset();
+	// int k = 32000;
+	// int truth = f.distinctTotal();
+	// int pmin_inv = k;
+	/* ----------------------END HAMLET---------------------------- */
 
 
 
@@ -100,11 +82,15 @@ int main(int argc, char *argv[])
 	for ( int i = 0; i < 20; i++)
 	{
 		/* ------------------DRAW NEW SAMPLES-------------------------------- */
-		// gen.uniform( 50000, k );
-		gen.discrete( 50000, &p );
+		gen.uniform( 50000, k );
+		// gen.discrete( 50000, &p );
+		// f.randread( 1000 );
 		/* ------------------END DRAW NEW SAMPLES-------------------------------- */
-		
+
+		/* ------------------GET HISTOGRAM-------------------------------- */
 		support.setHist( gen.getHist() );
+		// support.setHist( f.getHist() );
+		/* ------------------END GET HISTOGRAM-------------------------------- */
 		std::cout<< std::fixed
 				 << support.getN()
 				 << "\t" << truth
