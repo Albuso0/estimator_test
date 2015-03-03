@@ -6,7 +6,7 @@
 #include <boost/shared_array.hpp>
 
 
-class ChebMore  // Polynomial in the form cos(L arccos (bx+c))
+class ChebMore  // Polynomial in the form cos(L arccos (bx+c))=sum a_i * x^i
 {
 public:
     ChebMore(){}

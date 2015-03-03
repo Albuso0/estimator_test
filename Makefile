@@ -36,8 +36,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	## TODO: add all .cpp files here
-OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		## TODO: add all corresponding .o files here
+SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	samplegen.cpp	## TODO: add all .cpp files here
+OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -94,7 +94,7 @@ compiler_clean:
 filereader.o: filereader.cpp filereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-main.o: main.cpp filereader.h support.h fileofflinereader.h
+main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 support.o: support.cpp support.h chebmore.h
@@ -109,4 +109,5 @@ fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
 stringop.o: stringop.cpp stringop.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
 
-
+samplegen.o: samplegen.cpp samplegen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp

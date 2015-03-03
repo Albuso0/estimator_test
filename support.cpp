@@ -4,8 +4,9 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <boost/math/special_functions/binomial.hpp>
 
-
+/* ----------------------POLYNOMIAL ESTIMATOR-------------------------------- */
 template <typename T>
 double Support<T>::estimate()
 {
@@ -18,18 +19,8 @@ double Support<T>::estimate()
 template <typename T>
 double Support<T>::estimate_poly()
 {
-	std::map<int, int> HistHist;
-	for ( typename std::map<T,int>::const_iterator it = mpHist->begin(); it != mpHist->end(); ++it )
-	{
-		int freq = it->second;
-		std::map<int,int>::iterator iter = HistHist.find( freq );
-		if ( iter == HistHist.end() )
-			HistHist.insert( std::pair<int,int>( freq,1 ) );
-		else
-			++(iter->second);
-	}
 	double result = 0.0;
-	for ( std::map<int,int>::iterator it = HistHist.begin(); it != HistHist.end(); ++it )
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
 		if ( it->first < c_N * log(k) ) 
 		{
 			result += getCoeff(it->first) * it->second;
@@ -40,6 +31,144 @@ double Support<T>::estimate_poly()
 		}
 	return result;
 }
+
+template <typename T>
+double Support<T>::getCoeff( double N )
+{
+	double s = 2 / ( c_p * log(k) - n / k );
+	// double s = 2 / n / (rEnd-lEnd);
+	double gL = a[L];
+	for (int i = L - 1; i>=0; i--)
+		gL = a[i] + gL * (N-i) * s;
+	return gL;
+}
+/* ----------------------END POLYNOMIAL ESTIMATOR-------------------------------- */
+
+
+/* ----------------------POLYNOMIAL ESTIMATOR NO SPLITTING-------------------------------- */
+template <typename T>
+double Support<T>::estimate2()
+{
+	if ( n < c_p * k * log(k) ) // const
+		return estimate_poly2();
+	else
+		return estimate_plug();
+}
+
+template <typename T>
+double Support<T>::estimate_poly2()
+{
+	double result = 0.0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+		if ( it->first <= L ) 
+		{
+			result += getCoeff2(it->first) * it->second;
+		}
+		else
+		{
+			result += it->second;
+		}
+	return result;
+}
+template <typename T>
+double Support<T>::getCoeff2( double N )
+{
+	double s = 2 / ( c_p * log(k) - n / k );
+	// double s = 2 / n / (rEnd-lEnd);
+	double gL = 1;
+	for ( int i = 1; i <= N; ++i )
+		gL *= i * s;
+	return (1+gL*a[(int)N]);
+}
+/* ----------------------END POLYNOMIAL ESTIMATOR NO SPLITTING-------------------------------- */
+
+
+
+
+
+/* ----------------------OTHER ESTIMATORS-------------------------------- */
+template <typename T>
+double Support<T>::estimate_plug()
+{
+	double result = 0.0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+		result += it->second;
+	return result;
+}
+
+template <typename T>
+double Support<T>::estimate_TG()
+{
+	std::map<int, int>::const_iterator it = mpFin->find( 1 );
+	double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+	
+	return estimate_plug() / ( 1 - n1/n );
+}
+
+template <typename T>
+double Support<T>::estimate_JK( int order )
+{
+	double result = estimate_plug();
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+	{
+		int j = it->first;
+		if ( j > order )
+			break;
+		int nj = it->second;
+		int adjust = boost::math::binomial_coefficient<double>( order , j ) * nj;
+		result = ( j % 2 == 0 ) ? ( result - adjust ) : ( result + adjust ) ; 
+	}
+	return result;
+}
+
+template <typename T>
+double Support<T>::estimate_CL1()
+{
+	std::map<int, int>::const_iterator it = mpFin->find( 1 );
+	double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+	
+	double N1 = estimate_plug() / ( 1 - n1/n );
+
+	double sum = 0.0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+	{
+		int j = it->first;
+		int fj = it->second;
+		sum += j * ( j-1 ) * fj;
+		// std::cout<< sum <<" "<<j << " "<<fj<<std::endl;
+	}
+	double h_gamma_sq = std::max( N1 * sum / n / (n-1) , 0.0 );
+	
+	return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
+}
+
+template <typename T>
+double Support<T>::estimate_CL2()
+{
+	std::map<int, int>::const_iterator it = mpFin->find( 1 );
+	double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+	
+	double N1 = estimate_plug() / ( 1 - n1/n );
+
+	double sum = 0.0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+	{
+		int j = it->first;
+		int fj = it->second;
+		sum += j * ( j-1 ) * fj;
+	}
+	
+	double h_gamma_sq1 = std::max( N1 * sum / n / (n-1) , 0.0 );
+
+	double h_gamma_sq = std::max( h_gamma_sq1 * ( 1 + n1 * sum / (n-1) / (n-n1) ), 0.0 );
+	
+	return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
+}
+/* ----------------------END OTHER ESTIMATORS-------------------------------- */
+
+
+
+
 
 template <typename T>
 Support<T>::Support()
@@ -63,10 +192,32 @@ Support<T>::Support(int alpha)
 template <typename T>
 void Support<T>::setHist(std::shared_ptr< const std::map<T, int> > hist) 
 {
-	mpHist = hist;
+	std::shared_ptr< std::map<int, int> > pHistHist( new std::map<int, int> );
 	n = 0;
-	for ( typename std::map<T,int>::const_iterator it = mpHist->begin(); it != mpHist->end(); ++it )
-		n += it->second;
+	for ( typename std::map<T,int>::const_iterator it = hist->begin(); it != hist->end(); ++it )
+	{
+		int freq = it->second;
+		n += freq;
+		std::map<int,int>::iterator iter = pHistHist->find( freq );
+		if ( iter == pHistHist->end() )
+			pHistHist->insert( std::pair<int,int>( freq,1 ) );
+		else
+			++(iter->second);
+	}
+	mpFin = pHistHist;
+	if ( n > 0 )
+	{
+		rEnd = std::min<double>(1, c_p * log(k) / n);
+		updateArr();
+	}
+}
+template <typename T>
+void Support<T>::setFin(std::shared_ptr< const std::map<int, int> > fin) 
+{
+	mpFin = fin;
+	n = 0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+		n += it->first * it->second;
 	if ( n > 0 )
 	{
 		rEnd = std::min<double>(1, c_p * log(k) / n);
@@ -97,16 +248,7 @@ void Support<T>::updateArr() // the array a has length L = c_L * log(k), and dep
 	// for ( int i = 0; i <= L; i++ ) std::cout<<a[i]<<std::endl;
 }
 
-template <typename T>
-double Support<T>::getCoeff( int N )
-{
-	double s = 2 / ( c_p * log(k) - n / k );
-	// double s = 2 / n / (rEnd-lEnd);
-	double gL = a[L];
-	for (int i = L - 1; i>=0; i--)
-		gL = a[i] + gL * (N-i) * s;
-	return gL;
-}
+
 
 template <typename T>
 void Support<T>::setN( int _n )
@@ -139,3 +281,4 @@ void Support<T>::setCL( double L_threshold )
 }
 
 template class Support<std::string>;
+template class Support<int>;

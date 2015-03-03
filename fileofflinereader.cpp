@@ -3,9 +3,12 @@
 #include <fstream>
 #include <iterator>
 #include <set>
+#include "stringop.h"
 
 std::string FileOfflineReader::stdString(std::string word)
 {
+	StringOp::removepunc(word);
+	StringOp::tolower(word);
 	return word;
 }
 
