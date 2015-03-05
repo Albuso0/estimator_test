@@ -6,91 +6,84 @@
 #include "samplegen.h"
 #include <vector>
 
+#include "commandline.h"
 
+// In the following cN is not used in estimator-nosplitting
+void exp_uniform( int k, int n_step, int n_cnt, double cL, double cp, double cN ); 
+void exp_discrete( std::vector<double> &p, int pmin_inv, int n_step, int n_cnt, double cL, double cp, double cN );
+void exp_file( std::string filename, int pmin_inv, int n_step, int n_cnt, double cL, double cp, double cN );
 
 int main(int argc, char *argv[])
 {
+	double cL = 0.6, cp = 1, cN = 0.5;
+	int ExpType = 2;
+	std::CommandLine cmd;
+	cmd.AddValue ("cL",  "L=cL log k", cL);
+	cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
+	cmd.AddValue ("exp",  "0=uniform,1=mix,2=hamlet", ExpType);
+	cmd.Parse (argc, argv);
 
+	switch (ExpType)
+	{
+	case 0:
+	{
+		/* ----------------------UNIFORM---------------------------- */
+		int k = 1000000;
+		exp_uniform(k, 50000, 20, cL, cp, cN);
+		/* ----------------------END UNIFORM---------------------------- */
+	}
+	break;
 	
-	// FileOfflineReader f("hamlet.txt");
-	// std::cout<<f.distinctTotal()<<std::endl;
+	case 1:
+	{
+		/* ----------------------DISCRETE---------------------------- */
+		int k = 1000000;
+		std::vector<double> p( k );
+		p[0] = 0.5;
+		for (int i = 1; i < k; i++)
+			p[i] = 0.5 / (k-1);
 	
-	SampleGen gen;
-	gen.reset();
-	gen.setSeed( 0 );
-	
-	/* ----------------------UNIFORM---------------------------- */
-	int k = 1000000;
-	int truth = k;
-	int pmin_inv = k;
-	/* ----------------------END UNIFORM---------------------------- */
+		int pmin_inv = 2*(k-1);
+		exp_discrete( p, pmin_inv, 50000, 20, cL, cp, cN);
+		/* ----------------------END DISCRETE---------------------------- */
+	}
+	break;
 
-	
-	/* ----------------------DISCRETE---------------------------- */
-	// int k = 1000000;
-	// std::vector<double> p( k );
-	// p[0] = 0.5;
-	// for (int i = 1; i < k; i++)
-	// 	p[i] = 0.5 / (k-1);
-	// int truth = k;
-	// int pmin_inv = 2*(k-1);
-	/* ----------------------END DISCRETE---------------------------- */
+	case 2:
+	{
+		/* ----------------------FILE---------------------------- */
+		std::string filename = "hamlet.txt";
+		int pmin_inv = 32000;
+		exp_file( filename, pmin_inv, 1000, 32, cL, cp, cN);
+		/* ----------------------END FILE---------------------------- */
+	}
+	break;
+	default:
+		break;
+	}
 
-	
-	/* ----------------------HAMLET---------------------------- */
-	// FileOfflineReader f("hamlet.txt");
-	// f.reset();
-	// int k = 32000;
-	// int truth = f.distinctTotal();
-	// int pmin_inv = k;
-	/* ----------------------END HAMLET---------------------------- */
+    return 0;
+}
 
 
 
+void exp_file( std::string filename, int pmin_inv, int n_step, int n_cnt, double cL, double cp, double cN )
+{
+	FileOfflineReader f( filename );
+	f.reset();
 	
-	/* ------------------SUPPORT EXP 1-------------------------------- */
-	// Support<int> support( pmin_inv ); // set 1/p_min
-	// support.setCN(0.5); // Plug-in if N_i >= c_N * log(k)
-	// support.setCP(1); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
-	// support.setCL(1); // L = c_L * log(k)
-	
-	// std::cout<< "n \ttruth \tplug \tpoly \tTG \tCL1 \tCL2"<< std::endl;
-	// for ( int i = 0; i < 20; i++)
-	// {
-	// 	// gen.uniform( 50000, k );
-	// 	gen.discrete( 50000, &p );
-	// 	support.setHist( gen.getHist() );
-	// 	std::cout<< std::fixed
-	// 			 << support.getN()
-	// 			 << "\t" << truth
-	// 			 << "\t"<< (int)support.estimate_plug()
-	// 			 << "\t"<< (int)support.estimate()
-	// 			 << "\t"<< (int)support.estimate_TG()
-	// 			 << "\t"<< (int)support.estimate_CL1()
-	// 			 << "\t"<< (int)support.estimate_CL2()
-	// 			 << std::endl;
-	// }
-	/* ------------------END SUPPORT EXP 1-------------------------------- */
+	int truth = f.distinctTotal();
 
-	
-	/* ------------------SUPPORT EXP 2-------------------------------- */
-	Support<int> support( pmin_inv ); // set 1/p_min
-	support.setCP(1); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
-	support.setCL(1); // L = c_L * log(k) and plug-in if N>L
+	Support<std::string> support( pmin_inv ); // set 1/p_min
+	support.setCP(cp); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
+	support.setCL(cL); // L = c_L * log(k) and plug-in if N>L
+	support.setCN(cN);
 	
 	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tTG \tCL1 \tCL2"<< std::endl;
-	for ( int i = 0; i < 20; i++)
+	for ( int i = 0; i < n_cnt; i++)
 	{
-		/* ------------------DRAW NEW SAMPLES-------------------------------- */
-		gen.uniform( 50000, k );
-		// gen.discrete( 50000, &p );
-		// f.randread( 1000 );
-		/* ------------------END DRAW NEW SAMPLES-------------------------------- */
-
-		/* ------------------GET HISTOGRAM-------------------------------- */
-		support.setHist( gen.getHist() );
-		// support.setHist( f.getHist() );
-		/* ------------------END GET HISTOGRAM-------------------------------- */
+		f.randread( n_step );
+		support.setHist( f.getHist() );
 		std::cout<< std::fixed
 				 << support.getN()
 				 << "\t" << truth
@@ -102,11 +95,71 @@ int main(int argc, char *argv[])
 				 << "\t"<< (int)support.estimate_CL2()
 				 << std::endl;
 	}
-	/* ------------------END SUPPORT EXP 2-------------------------------- */
-
-		
-	
-	
-    return 0;
 }
+
+
+void exp_uniform( int k, int n_step, int n_cnt, double cL, double cp, double cN )
+{
+	SampleGen gen;
+	gen.reset();
+	gen.setSeed( 0 );
+	
+	int truth = k;
+
+	Support<int> support( k ); 
+	support.setCP(cp); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
+	support.setCL(cL); // L = c_L * log(k) and plug-in if N>L
+	support.setCN(cN);
+
+
+	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tTG \tCL1 \tCL2"<< std::endl;
+	for ( int i = 0; i < n_cnt; i++)
+	{
+		gen.uniform( n_step, k );
+		support.setHist( gen.getHist() );
+		std::cout<< std::fixed
+				 << support.getN()
+				 << "\t" << truth
+				 << "\t"<< (int)support.estimate_plug()
+				 << "\t"<< (int)support.estimate()
+				 << "\t"<< (int)support.estimate2()
+				 << "\t"<< (int)support.estimate_TG()
+				 << "\t"<< (int)support.estimate_CL1()
+				 << "\t"<< (int)support.estimate_CL2()
+				 << std::endl;
+	}
+}
+
+
+void exp_discrete( std::vector<double> &p, int pmin_inv, int n_step, int n_cnt, double cL, double cp, double cN )
+{
+	SampleGen gen;
+	gen.reset();
+	gen.setSeed( 0 );
+	
+	int truth = p.size();
+
+	Support<int> support( pmin_inv ); // set 1/p_min
+	support.setCP(cp); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
+	support.setCL(cL); // L = c_L * log(k) and plug-in if N>L
+	support.setCN(cN);
+
+	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tTG \tCL1 \tCL2"<< std::endl;
+	for ( int i = 0; i < n_cnt; i++)
+	{
+		gen.discrete( n_step, &p );
+		support.setHist( gen.getHist() );
+		std::cout<< std::fixed
+				 << support.getN()
+				 << "\t" << truth
+				 << "\t"<< (int)support.estimate_plug()
+				 << "\t"<< (int)support.estimate()
+				 << "\t"<< (int)support.estimate2()
+				 << "\t"<< (int)support.estimate_TG()
+				 << "\t"<< (int)support.estimate_CL1()
+				 << "\t"<< (int)support.estimate_CL2()
+				 << std::endl;
+	}
+}
+
 

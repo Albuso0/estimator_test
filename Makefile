@@ -36,8 +36,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	samplegen.cpp	## TODO: add all .cpp files here
-OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		## TODO: add all corresponding .o files here
+SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	samplegen.cpp	commandline.cpp	## TODO: add all .cpp files here
+OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		commandline.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -111,3 +111,6 @@ stringop.o: stringop.cpp stringop.h
 
 samplegen.o: samplegen.cpp samplegen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
+
+commandline.o: commandline.cpp commandline.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
