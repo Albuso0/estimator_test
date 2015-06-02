@@ -16,7 +16,7 @@ void exp_file( std::string filename, int pmin_inv, int n_step, int n_cnt, double
 int main(int argc, char *argv[])
 {
 	double cL = 0.6, cp = 1, cN = 0.5;
-	int ExpType = 2;
+	int ExpType = 0;
 	std::CommandLine cmd;
 	cmd.AddValue ("cL",  "L=cL log k", cL);
 	cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
@@ -61,6 +61,48 @@ int main(int argc, char *argv[])
 	default:
 		break;
 	}
+
+	// ----------------------TEST ON HAMLET ---------------------------- //
+	// Support<int> support( 1000000 );
+	// support.setCL(0.8);
+	// support.setCP(1);
+	// support.setN(200000);
+	// int L = support.getL();
+	// // std::cout<<L<<std::endl;
+	// for (int i=0; i <= L+3; i++)
+	// 	std::cout<<i<<"\t"<<support.getCoeff2(i)<<std::endl;
+	
+	// {
+	// 	int k = 1000000;
+	// 	Support<std::string> support( k );
+	// 	support.setCP(1);
+	// 	support.setCL(0.8);
+
+		
+	// 	std::shared_ptr<std::map<int, int> > fin(new std::map<int, int>);
+		
+	// 	std::ifstream infile;
+	// 	infile.open( "../Shake-parse/fin-spe.txt" );
+	// 	for (int i = 0; i < 100; ++i)
+	// 	{
+	// 		int j, fj;
+	// 		infile >> j >> fj;
+	// 		fin->insert( std::pair<int,int>( j,fj ) );
+	// 		// std::cout<<j<<" "<<fj<<std::endl;
+	// 	}
+	// 	infile.close();
+		
+	// 	support.setFin( fin );
+	// 	std::cout<< std::fixed
+	// 			 << (int)support.estimate_plug() + 846
+	// 			 << "\t"<< (int)support.estimate() + 846
+	// 			 << "\t"<< (int)support.estimate2() + 846
+	// 			 // << "\t"<< (int)support.estimate_TG()
+	// 			 // << "\t"<< (int)support.estimate_CL1()
+	// 			 // << "\t"<< (int)support.estimate_CL2()
+	// 			 << std::endl;
+	// }
+	// ----------------------END TEST ON HAMLET ---------------------------- //
 
     return 0;
 }
@@ -112,7 +154,7 @@ void exp_uniform( int k, int n_step, int n_cnt, double cL, double cp, double cN 
 	support.setCN(cN);
 
 
-	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tTG \tCL1 \tCL2"<< std::endl;
+	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tsinc \tTG \tCL1 \tCL2"<< std::endl;
 	for ( int i = 0; i < n_cnt; i++)
 	{
 		gen.uniform( n_step, k );
@@ -123,6 +165,7 @@ void exp_uniform( int k, int n_step, int n_cnt, double cL, double cp, double cN 
 				 << "\t"<< (int)support.estimate_plug()
 				 << "\t"<< (int)support.estimate()
 				 << "\t"<< (int)support.estimate2()
+				 << "\t"<< (int)support.estimate_sinc()
 				 << "\t"<< (int)support.estimate_TG()
 				 << "\t"<< (int)support.estimate_CL1()
 				 << "\t"<< (int)support.estimate_CL2()
@@ -144,7 +187,7 @@ void exp_discrete( std::vector<double> &p, int pmin_inv, int n_step, int n_cnt, 
 	support.setCL(cL); // L = c_L * log(k) and plug-in if N>L
 	support.setCN(cN);
 
-	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tTG \tCL1 \tCL2"<< std::endl;
+	std::cout<< "n \ttruth \tplug \tpoly \tpoly2 \tsinc \tTG \tCL1 \tCL2"<< std::endl;
 	for ( int i = 0; i < n_cnt; i++)
 	{
 		gen.discrete( n_step, &p );
@@ -155,6 +198,7 @@ void exp_discrete( std::vector<double> &p, int pmin_inv, int n_step, int n_cnt, 
 				 << "\t"<< (int)support.estimate_plug()
 				 << "\t"<< (int)support.estimate()
 				 << "\t"<< (int)support.estimate2()
+				 << "\t"<< (int)support.estimate_sinc()
 				 << "\t"<< (int)support.estimate_TG()
 				 << "\t"<< (int)support.estimate_CL1()
 				 << "\t"<< (int)support.estimate_CL2()

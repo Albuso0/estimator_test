@@ -73,6 +73,8 @@ double Support<T>::estimate_poly2()
 template <typename T>
 double Support<T>::getCoeff2( double N )
 {
+	if (N==0) return 0;
+	
 	double s = 2 / ( c_p * log(k) - n / k );
 	// double s = 2 / n / (rEnd-lEnd);
 	double gL = 1;
@@ -163,6 +165,34 @@ double Support<T>::estimate_CL2()
 	double h_gamma_sq = std::max( h_gamma_sq1 * ( 1 + n1 * sum / (n-1) / (n-n1) ), 0.0 );
 	
 	return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
+}
+
+template <typename T>
+double Support<T>::estimate_sinc()
+{
+	double sum = 0.0;
+	for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+	{
+		int j = it->first;
+		int fj = it->second;
+		if ( it->first <= L )
+		{
+			double gj = 0;
+			double multi = -1.0;
+			for ( int i = 1; 2*i <= j; i++ )
+			{
+				multi *= - (3.1415926*k/n) * (3.1415926*k/n);
+				gj += boost::math::binomial_coefficient<double>( j , 2*i ) * multi / (2*i+1);
+			}
+			sum += gj * fj;
+		}
+		else
+		{
+			sum += fj;
+		}
+	}
+	
+	return sum;
 }
 /* ----------------------END OTHER ESTIMATORS-------------------------------- */
 

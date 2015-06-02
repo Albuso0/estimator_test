@@ -29,6 +29,7 @@ public:
 	double estimate_JK( int order );
 	double estimate_CL1();
 	double estimate_CL2();
+	double estimate_sinc();
 
 	
 	void setN( int _n ); // set n, update rEnd, a
