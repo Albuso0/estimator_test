@@ -39,3 +39,18 @@ SampleGen::SampleGen()
 	:mpHist(new std::map<int, int>)
 {
 }
+
+SampleGen::const_HistPtr SampleGen::getFin() const
+{
+	std::shared_ptr< std::map<int, int> > pHistHist( new std::map<int, int> );
+	for ( std::map<int,int>::const_iterator it = mpHist->begin(); it != mpHist->end(); ++it )
+	{
+		int freq = it->second;
+		std::map<int,int>::iterator iter = pHistHist->find( freq );
+		if ( iter == pHistHist->end() )
+			pHistHist->insert( std::pair<int,int>( freq,1 ) );
+		else
+			++(iter->second);
+	}
+        return pHistHist;
+}

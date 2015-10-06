@@ -37,7 +37,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		commandline.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		commandline.o	entropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -114,3 +114,6 @@ compiler_clean:
 
 # commandline.o: commandline.cpp commandline.h
 # 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
+
+# entropy.o: entropy.cpp entropy.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
