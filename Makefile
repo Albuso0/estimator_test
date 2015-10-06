@@ -36,7 +36,7 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = filereader.cpp	main.cpp	support.cpp		chebmore.cpp 	fileofflinereader.cpp 	stringop.cpp	samplegen.cpp	commandline.cpp	## TODO: add all .cpp files here
+SOURCES       = 
 OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		commandline.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
@@ -46,22 +46,22 @@ TARGET        = support
 first: all
 ####### Implicit rules
 
-.SUFFIXES: .o .c .cpp .cc .cxx .C
+# .SUFFIXES: .o .c .cpp .cc .cxx .C
 
-.cpp.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+# .cpp.o:
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
-.cc.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+# .cc.o:
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
-.cxx.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+# .cxx.o:
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
-.C.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+# .C.o:
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
-.c.o:
-	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
+# .c.o:
+# 	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
 
 ####### Build rules
 
@@ -91,26 +91,26 @@ compiler_clean:
 
 # TODO: add all dependencies for the .o
 
-filereader.o: filereader.cpp filereader.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
+# filereader.o: filereader.cpp filereader.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+# main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
-support.o: support.cpp support.h chebmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
+# support.o: support.cpp support.h chebmore.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
 
-chebmore.o: chebmore.cpp chebmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
+# chebmore.o: chebmore.cpp chebmore.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
 
-fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
+# fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
 
-stringop.o: stringop.cpp stringop.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
+# stringop.o: stringop.cpp stringop.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
 
-samplegen.o: samplegen.cpp samplegen.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
+# samplegen.o: samplegen.cpp samplegen.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
 
-commandline.o: commandline.cpp commandline.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
+# commandline.o: commandline.cpp commandline.h
+# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
