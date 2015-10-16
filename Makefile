@@ -37,10 +37,10 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = filereader.o	main.o		support.o		chebmore.o 		fileofflinereader.o 	stringop.o		samplegen.o		commandline.o	entropy.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	support.o	chebmore.o 	fileofflinereader.o 	stringop.o	samplegen.o	commandline.o	entropy.o	main.o	mainentropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = support
+TARGET        = entropy
 
 
 first: all
@@ -67,8 +67,11 @@ first: all
 
 all: $(TARGET)
 
-$(TARGET):  $(OBJECTS)  
-	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
+entropy: entropy.o samplegen.o commandline.o mainentropy.o
+	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
+
+# $(TARGET):  $(OBJECTS)  
+# 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
 
 dist: 
 	@test -d .tmp/test1.0.0 || mkdir -p .tmp/test1.0.0
@@ -91,29 +94,32 @@ compiler_clean:
 
 # TODO: add all dependencies for the .o
 
-# filereader.o: filereader.cpp filereader.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
+filereader.o: filereader.cpp filereader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-# main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+support.o: support.cpp support.h chebmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
 
-# support.o: support.cpp support.h chebmore.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
+chebmore.o: chebmore.cpp chebmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
 
-# chebmore.o: chebmore.cpp chebmore.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
+fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
 
-# fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
+stringop.o: stringop.cpp stringop.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
 
-# stringop.o: stringop.cpp stringop.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
+samplegen.o: samplegen.cpp samplegen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
 
-# samplegen.o: samplegen.cpp samplegen.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
+commandline.o: commandline.cpp commandline.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
 
-# commandline.o: commandline.cpp commandline.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
+entropy.o: entropy.cpp entropy.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
 
-# entropy.o: entropy.cpp entropy.h
-# 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
+main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+
+mainentropy.o: mainentropy.cpp entropy.h samplegen.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainentropy.o mainentropy.cpp

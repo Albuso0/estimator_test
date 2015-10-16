@@ -1,5 +1,6 @@
 #include "fileofflinereader.h"
 #include "support.h"
+#include "entropy.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -15,21 +16,48 @@ void exp_file( std::string filename, int pmin_inv, int n_step, int n_cnt, double
 
 int main(int argc, char *argv[])
 {
+    double cL = 0.6, cp = 1, cN = 0.5;
+    int seed = 0;
+    std::CommandLine cmd;
+    cmd.AddValue ("cL",  "", cL);
+    cmd.AddValue ("cp",  "", cp);
+    cmd.AddValue ("cN",  "", cN);
+    cmd.AddValue ("seed",  "", seed);
+    cmd.Parse (argc, argv);
+    
+    int k = 100000;
+    std::cout<<cL<<"\t"<<cp<<"\t"<<cN<<"\n";
+    
     SampleGen gen;
     gen.reset();
-    gen.setSeed( 0 );
-    gen.uniform( 20, 100 );
-    std::shared_ptr< const std::map<int, int> > pHist = gen.getHist();
-    for ( std::map<int,int>::const_iterator it = pHist->begin(); it != pHist->end(); ++it )
+    gen.setSeed( seed );
+    
+    // std::vector<double> p( k );
+    // for (int i = 0; i < k/2; i++)
+    //     p[i] = 1;
+    // for (int i = k/2; i < k; i++)
+    //     p[i] = 0;
+    
+    double truth = log(k/2);
+
+    Entropy entropy( k );
+    entropy.setDegree( cL*log(k) );
+    entropy.setInterval( cp*log(k) );
+    entropy.setThreshold( cN*log(k) );
+    for ( int i = 0; i < 20; i++)
     {
-        std::cout<<it->first<<"\t"<<it->second<<std::endl;
+        gen.uniform( 2000, k/2 );
+        entropy.setFin( gen.getFin() );
+        std::cout<< std::fixed
+                 << entropy.getN()
+                 << "\t" << entropy.getL()
+                 << "\t" << truth
+                 << "\t" << truth-entropy.estimate_plug()
+                 << "\t" << truth-entropy.estimate()
+                 << std::endl;
     }
-    std::cout<<std::endl;
-    std::shared_ptr< const std::map<int, int> > pFin = gen.getFin();
-    for ( std::map<int,int>::const_iterator it = pFin->begin(); it != pFin->end(); ++it )
-    {
-        std::cout<<it->first<<"\t"<<it->second<<std::endl;
-    }
+
+        
     
 	// double cL = 0.6, cp = 1, cN = 0.5;
 	// int ExpType = 0;
