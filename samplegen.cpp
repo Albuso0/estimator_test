@@ -4,9 +4,9 @@
 
 void SampleGen::addSample(int data)
 {
-	std::map<int, int>::iterator it = mpHist->find( data );
+	auto it = mpHist->find( data );
 	if ( it == mpHist->end() )
-		mpHist->insert( std::pair<int,int>( data ,1 ) );
+		mpHist->insert( std::make_pair( data ,1 ) );
 	else
 		++(it->second);
 }
@@ -43,12 +43,12 @@ SampleGen::SampleGen()
 SampleGen::const_HistPtr SampleGen::getFin() const
 {
 	std::shared_ptr< std::map<int, int> > pHistHist( new std::map<int, int> );
-	for ( std::map<int,int>::const_iterator it = mpHist->begin(); it != mpHist->end(); ++it )
+	for ( const auto & pair : *mpHist )
 	{
-		int freq = it->second;
-		std::map<int,int>::iterator iter = pHistHist->find( freq );
+		int freq = pair.second;
+		auto iter = pHistHist->find( freq );
 		if ( iter == pHistHist->end() )
-			pHistHist->insert( std::pair<int,int>( freq,1 ) );
+			pHistHist->insert( std::make_pair( freq,1 ) );
 		else
 			++(iter->second);
 	}

@@ -15,8 +15,8 @@ public:
     double getCoeff( int N ); // compute g(N). 
     // Without the sample splitting required by theory
     double estimate(); // Hist must be given
-
     double estimate_plug();
+    double estimate_Miller_Madow();
 
     void setAlphabetSize( int alphabet_size ) { k = alphabet_size; }
     void setThreshold( double N_threshold ){ N_thr = N_threshold; }

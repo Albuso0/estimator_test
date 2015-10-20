@@ -7,18 +7,18 @@ double Entropy::estimate()
 {
     double HEsti = 0;
     int symbolnumber = 0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    for ( const auto & pair : *mpFin )
     {
-        int N = it->first;
-        symbolnumber += it->second;
+        int N = pair.first;
+        symbolnumber += pair.second;
         if ( N > N_thr) // plug-in
         {
             double x = (double)N / (double)n;
-            HEsti += (-x*log(x)+0.5/n) * (it->second);
+            HEsti += (-x*log(x)+0.5/n) * (pair.second);
         }
         else // polynomial
         {
-            HEsti += getCoeff(N) * (it->second);
+            HEsti += getCoeff(N) * (pair.second);
         }
     }
     HEsti += getCoeff(0) * (k-symbolnumber);
@@ -29,22 +29,39 @@ double Entropy::estimate()
     return HEsti/log(2); // return the estimated entropy (bits)
 }
 
+double Entropy::estimate_Miller_Madow()
+{
+    double HEsti = 0;
+    int symbolnumber = 0;
+    for ( const auto & pair : *mpFin )
+    {
+        int N = pair.first;
+        symbolnumber += pair.second;
+        if ( N>0 )
+        {
+            double x = (double)N / (double)n;
+            HEsti += (-x*log(x)) * (pair.second);
+        }
+    }
+    return (HEsti+(symbolnumber-1)/n)/log(2); // return the empirical entropy (bits)
+}
 
 
 double Entropy::estimate_plug()
 {
     double HEsti = 0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    for ( const auto & pair : *mpFin )
     {
-        int N = it->first;
+        int N = pair.first;
         if ( N>0 )
         {
             double x = (double)N / (double)n;
-            HEsti += (-x*log(x)) * (it->second);
+            HEsti += (-x*log(x)) * (pair.second);
         }
     }
     return HEsti/log(2); // return the empirical entropy (bits)
 }
+
 
 double Entropy::getCoeff( int N )
 {

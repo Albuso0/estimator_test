@@ -4,7 +4,7 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -std=c++11 # -Wextra -pedantic
+DEFINES       = -std=c++14 # -Wextra -pedantic
 CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 CXXFLAGS      = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
 INCPATH       = -I.
