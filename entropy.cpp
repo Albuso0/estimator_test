@@ -21,7 +21,7 @@ double Entropy::estimate()
             HEsti += getCoeff(N) * (pair.second);
         }
     }
-    HEsti += getCoeff(0) * (k-symbolnumber);
+    HEsti += 1.0*getCoeff(0) * (k-symbolnumber);
     
     HEsti = (HEsti > 0)? HEsti:0;
     HEsti = (HEsti < log(k))?HEsti:log(k);
@@ -43,7 +43,7 @@ double Entropy::estimate_Miller_Madow()
             HEsti += (-x*log(x)) * (pair.second);
         }
     }
-    return (HEsti+(symbolnumber-1)/n)/log(2); // return the empirical entropy (bits)
+    return (HEsti+1.0*(symbolnumber-1)/n/2)/log(2); // return the bias-corrected empirical entropy (bits)
 }
 
 

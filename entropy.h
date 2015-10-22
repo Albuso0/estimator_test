@@ -24,6 +24,7 @@ public:
     void setDegree( int deg ); // also update the coefficients array
     void setFin(std::shared_ptr< const std::map<int, int> > fin); // set fingerprint, also update sample size
 
+    int getAlphabetSize() const{ return k; }
     int getSampleSize() const{ return n; }
     int getDegree() const{ return L; }
     double getThreshold() const{ return N_thr; }
