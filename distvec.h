@@ -3,6 +3,14 @@
 
 #include <vector>
 
+std::vector<double> uniform(int k)
+{
+    std::vector<double> p( k );
+    for (int i = 0; i < k; ++i)
+        p[i] = 1.0;
+    printf("Uniform distribution.\n");
+    return p;
+}
 
 
 std::vector<double> uniformhalf(int k)
@@ -33,6 +41,15 @@ std::vector<double> zipf(int k)
     for (int i = 0; i < k; ++i)
         p[i] = 1.0/(i+1);
     printf("Zipf(1) distribution.\n");
+    return p;
+}
+
+std::vector<double> zipfd5(int k)
+{
+    std::vector<double> p( k );
+    for (int i = 0; i < k; ++i)
+        p[i] = 1.0/sqrt(i+1);
+    printf("Zipf(0.5) distribution.\n");
     return p;
 }
 

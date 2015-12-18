@@ -16,29 +16,49 @@ void TEST_fixed_P_RMSE(std::vector<double> &p, Entropy &entropy, std::vector<int
 
 int main(int argc, char *argv[])
 {
-    // std::CommandLine cmd;
-    // cmd.AddValue ("seed",  "", seed);
-    // cmd.Parse (argc, argv);
-    double c0 = 2, c1 = 3, c2 = 1;
-    // double c0 = 1.3, c1 = 8, c2 = 1.5;
     int k = 100000;
+    int exp = 1;
+    // double c0 = 2, c1 = 3, c2 = 1;
+    // double c0 = 1.3, c1 = 8, c2 = 1.5;
     
-    Entropy entropy( k );
-    entropy.setDegree( c0*log(k) );
-    entropy.setInterval( c1*log(k) );
-    entropy.setThreshold( c2*log(k) );
+    std::CommandLine cmd;
+    cmd.AddValue ("exp",  "", exp);
+    cmd.Parse (argc, argv);
+    
 
-    // Test sample size
+    // Set sample size for test
     std::vector<int> testN;
-    for ( int i = 1; i <= 50; ++i )
-        testN.push_back( 1000*i );
+    long n = 1000;
+    for ( int i = 0; i < 15; i++ )
+    {
+        n *= 2;
+    }
+    testN.push_back( n );
 
-    // Test distribution
-    std::vector<double> p = mixgeozipf(k);
+    // Set distribution for test
+    std::vector<double> p;
+    switch(exp)
+    {
+    case 0: p = uniform(k); break;
+    case 1: p = zipf(k); break;
+    case 2: p = zipfd5(k); break;
+    case 3: p = mixgeozipf(k); break;
+
+    }
+    // Set estimator
+    Entropy entropy( k );
+    entropy.setDegree( 18 );
+    entropy.setInterval( 40 );
+    entropy.setThreshold( 18 ); 
+    printf("Alphabet size=%d.\n", entropy.getAlphabetSize());
+    printf("Polynoimal degree=%d.\n", entropy.getDegree());
+    printf("Approximation interval=[0,%.2f/n].\n", entropy.getInterval());
+    printf("Plug-in threshold=%d.\n",(int)floor(entropy.getThreshold())+1);
+    printf("Unit: bits\n");
 
     // TEST_fixed_P(p, entropy, testN);
 
-    const int trials = 20;
+    const int trials = 50;
     TEST_fixed_P_RMSE(p, entropy, testN, trials);
     
     return 0;
@@ -55,11 +75,6 @@ void TEST_fixed_P(std::vector<double> &p, Entropy &entropy, std::vector<int> &te
             truth += ( -mass/norm*log(mass/norm) );
     truth /= log(2);
     
-    printf("Alphabet size=%d.\n", entropy.getAlphabetSize());
-    printf("Polynoimal degree=%d.\n", entropy.getDegree());
-    printf("Approximation interval=[0,%.2f/n].\n", entropy.getInterval());
-    printf("Plug-in threshold=%d.\n",(int)floor(entropy.getThreshold())+1);
-    printf("Unit: bits\n");
     printf("\nSample size\tTruth\t\tPlug-in\t\tMiller-Madow\tPolynomial\n");
 
     SampleGen gen;
@@ -89,12 +104,7 @@ void TEST_fixed_P_RMSE(std::vector<double> &p, Entropy &entropy, std::vector<int
             truth += ( -mass/norm*log(mass/norm) );
     truth /= log(2);
     
-    printf("Alphabet size=%d.\n", entropy.getAlphabetSize());
-    printf("Polynoimal degree=%d.\n", entropy.getDegree());
-    printf("Approximation interval=[0,%.2f/n].\n", entropy.getInterval());
-    printf("Plug-in threshold=%d.\n",(int)floor(entropy.getThreshold())+1);
     printf("Number of trials=%d\n", trials);
-    printf("Unit: bits\n");
     printf("\nSample size\tTruth\t\tRMSE:plug\tRMSE:MM\t\tRMSE:Poly\n");
 
     SampleGen gen;

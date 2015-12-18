@@ -15,6 +15,7 @@ public:
     double getCoeff( int N ); // compute g(N). 
     // Without the sample splitting required by theory
     double estimate(); // Hist must be given
+    double estimate_non_zero(); // Only use fingerprint f_j for j>=1. In other words, g(0)=0.
     double estimate_plug();
     double estimate_Miller_Madow();
 

@@ -24,7 +24,30 @@ double Entropy::estimate()
     HEsti += 1.0*getCoeff(0) * (k-symbolnumber);
     
     HEsti = (HEsti > 0)? HEsti:0;
-    HEsti = (HEsti < log(k))?HEsti:log(k);
+    // HEsti = (HEsti < log(k))?HEsti:log(k);
+
+    return HEsti/log(2); // return the estimated entropy (bits)
+}
+
+double Entropy::estimate_non_zero() // Only use fingerprint f_j for j>=1. In other words, g(0)=0.
+{
+    double HEsti = 0;
+    for ( const auto & pair : *mpFin )
+    {
+        int N = pair.first;
+        if ( N > N_thr) // plug-in
+        {
+            double x = (double)N / (double)n;
+            HEsti += (-x*log(x)+0.5/n) * (pair.second);
+        }
+        else // polynomial
+        {
+            HEsti += getCoeff(N) * (pair.second);
+        }
+    }
+    
+    HEsti = (HEsti > 0)? HEsti:0;
+    // HEsti = (HEsti < log(k))?HEsti:log(k);
 
     return HEsti/log(2); // return the estimated entropy (bits)
 }
