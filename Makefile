@@ -40,7 +40,7 @@ SOURCES       =
 OBJECTS       = filereader.o	support.o	chebmore.o 	fileofflinereader.o 	stringop.o	samplegen.o	commandline.o	entropy.o	main.o	mainentropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = entropy
+TARGET        = entropy		support
 
 
 first: all
@@ -69,6 +69,9 @@ all: $(TARGET)
 
 entropy: entropy.o samplegen.o commandline.o mainentropy.o
 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
+
+support: support.o samplegen.o commandline.o main.o chebmore.o fileofflinereader.o stringop.o
+	$(LINK) $(LFLAGS) support.o samplegen.o main.o commandline.o chebmore.o fileofflinereader.o stringop.o $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
