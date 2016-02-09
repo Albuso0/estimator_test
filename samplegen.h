@@ -9,25 +9,23 @@
 class SampleGen // Random sample generator and counter for DISCRETE distributions
 {
 public:
-    typedef std::shared_ptr<std::map<int, int> >  HistPtr;
-    typedef std::shared_ptr<const std::map<int, int> >  const_HistPtr;
-    SampleGen();
+    SampleGen(){}
     virtual ~SampleGen(){}
 	
-    void reset(){ mpHist->clear(); }
+    void reset(){ hist.clear(); }
     void setSeed(int _seed){ generator.seed( _seed ); }
 	
+    void discrete(int n, std::vector<double>* p);
+
     void uniform(int n, int k);  // generate n samples from Uniform[0:k-1] and update histogram
     void Poisson_truncated(int n, double lamdba, int min, int max);  // generate n samples from truncated Poi(lambda) and update histogram
-    void discrete(int n, std::vector<double>* p);
     void negative_binomial(int n, int k, double p);
-    
-    const_HistPtr getHist() const{ return mpHist; }
-    const_HistPtr getFin() const;
+
+    std::vector<int> getHist() const;
 
 private:
     std::default_random_engine generator;
-    HistPtr mpHist;
+    std::map<int, int> hist;
 	
     void addSample(int sample); // add the sample to histogram
     template <typename T>

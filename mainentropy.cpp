@@ -86,7 +86,7 @@ void TEST_fixed_P(std::vector<double> &p, Entropy &entropy, std::vector<int> &te
     {
         gen.discrete( n-currentN, &p );
         currentN = n;
-        entropy.setFin( gen.getFin() );
+        entropy.setHist( gen.getHist() );
         printf("%d\t\t%.6f\t%.6f\t%.6f\t%.6f\n", entropy.getSampleSize(), truth, entropy.estimate_plug(), entropy.estimate_Miller_Madow(), entropy.estimate() );
     }
     return;
@@ -117,7 +117,7 @@ void TEST_fixed_P_RMSE(std::vector<double> &p, Entropy &entropy, std::vector<int
             gen.reset();
             gen.setSeed( seed );
             gen.discrete( n, &p );
-            entropy.setFin( gen.getFin() );
+            entropy.setHist( gen.getHist() );
             SE_plug += pow(truth-entropy.estimate_plug(),2);
             SE_MM += pow(truth-entropy.estimate_Miller_Madow(),2);
             SE_poly += pow(truth-entropy.estimate(),2);

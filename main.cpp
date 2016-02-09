@@ -64,11 +64,7 @@ void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, d
         for ( int i = 0; i < n_cnt; i++)
         {
             gen.discrete( n_step, &p );
-            std::vector<int> hist; 
-            auto ptr_hist = gen.getHist();
-            for ( auto it = ptr_hist->begin(); it != ptr_hist->end(); ++it )
-                hist.push_back(it->second);
-            support.setHist( hist );
+            support.setHist( gen.getHist() );
             plug[i].push_back( (int)support.estimate_plug() ); 
             poly[i].push_back( (int)support.estimate() );
             TG[i].push_back( (int)support.estimate_TG() );
@@ -82,7 +78,7 @@ void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, d
     for ( int i = 0; i < n_cnt; i++)
     {
         n += n_step;
-        std::cout<<n<<"\t"<<mean(plug[i])<<"\t"<<mean(poly[i])<<"\t"<<mean(TG[i])<<"\t"<<mean(CL1[i])<<"\t"<<mean(CL2[i])<<"\t"<<mean(J1[i])<<std::endl;
+        std::cout<<n<<"\t"<<truth<<"\t"<<mean(plug[i])<<"\t"<<mean(poly[i])<<"\t"<<mean(TG[i])<<"\t"<<mean(CL1[i])<<"\t"<<mean(CL2[i])<<"\t"<<mean(J1[i])<<std::endl;
         // printf("%d\t%d\t  %.1f\t%.6f\t%.6f\t  %.1f\t%.6f\t%.6f\t  %.1f\t%.6f\t%.6f\t  %.1f\t%.6f\t%.6f\t  %.1f\t%.6f\t%.6f\t  \n", 
         //        n, 
         //        truth,
