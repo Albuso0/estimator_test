@@ -18,11 +18,13 @@ public:
     double getCoeff( int N ) const;
 	
     // Other estimators
-    double estimate_plug() const;
-    double estimate_TG() const;
-    double estimate_JK( int order ) const;
-    double estimate_CL1() const;
-    double estimate_CL2() const;
+    double estimate_plug() const;  // Plug-in estimator
+    double coverage_TG() const;    // Turing-Good coverage
+    double estimate_TG() const;    // Turing-Good estimator
+    double estimate_J1() const;    // First order Jackknife
+    double estimate_CL1() const;   // Chao-Lee 1
+    double estimate_CL2() const;   // Chao-Lee 2
+    // Old estimators
     double estimate_sinc() const;
     double estimate_old() const;
     double getCoeff_old( double N ) const;

@@ -6,55 +6,6 @@
 #include <algorithm>
 #include <boost/math/special_functions/binomial.hpp>
 
-/* ----------------------POLYNOMIAL ESTIMATOR-------------------------------- */
-
-double Support::estimate_old() const
-{
-    if ( pmin < Ratio / n ) // const
-    {
-        double result = 0.0;
-        for ( const auto & pair : fin )
-            if ( pair.first < N_thr ) 
-            {
-                result += getCoeff_old(pair.first) * pair.second;
-            }
-            else
-            {
-                result += pair.second;
-            }
-        return result;
-    }
-    else
-        return estimate_plug();
-}
-
-double Support::getCoeff_old( double N ) const
-{
-    double rEnd = Ratio / n;
-    double lEnd = pmin;
-    double A = ( rEnd + lEnd ) / ( rEnd - lEnd );
-    double a[L+1];
-	
-    ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
-    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
-    double amp = cheb.evaluate(0); // cos L arccos(-A)
-
-    // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
-    for (unsigned i = 0;i < L+1;i++) a[i] = - a0[i] / amp;
-    a[0] += 1;
-    a[0] = 0;
-    
-    double s = 2 / ( Ratio - n * pmin );
-    // double s = 2 / n / (rEnd-lEnd);
-    double gL = a[L];
-    for (int i = L - 1; i>=0; i--)
-        gL = a[i] + gL * (N-i) * s;
-    return gL;
-}
-
-
-/* ----------------------END POLYNOMIAL ESTIMATOR-------------------------------- */
-
 
 
 
@@ -113,6 +64,8 @@ double Support::getCoeff( int N ) const
 
 
 /* ----------------------OTHER ESTIMATORS-------------------------------- */
+// Ref for TG, CL1, CL2: "Estimating the Number of Classes via Sample Coverage, Chao-Lee, 1992"
+// Ref for JK: "Robust Estimation of Population Size When Capture Probabilities Vary Among Animals. K. P. Burnham and W. S. Overton, 1979"
 
 double Support::estimate_plug() const
 {
@@ -122,89 +75,114 @@ double Support::estimate_plug() const
     return result;
 }
 
+double Support::coverage_TG() const
+{
+    double n1 = 0;
+    for ( const auto & pair : fin )
+        if ( pair.first == 1 )
+        {
+            n1 = pair.second;
+            break;
+        }
+    return (1 - n1/n);
+}
 
 double Support::estimate_TG() const
 {
-    double n1 = 0;
-    for ( const auto & pair : fin )
-        if ( pair.first == 1 )
-        {
-            n1 = pair.second;
-            break;
-        }
-	
-    return estimate_plug() / ( 1 - n1/n );
+    return ( estimate_plug() / coverage_TG() );
 }
 
 
-double Support::estimate_JK( int order ) const
+double Support::estimate_J1() const
 {
-    double result = estimate_plug();
-    for ( const auto & pair : fin )
-    {
-        int j = pair.first;
-        if ( j > order )
-            break;
-        int nj = pair.second;
-        int adjust = boost::math::binomial_coefficient<double>( order , j ) * nj;
-        result = ( j % 2 == 0 ) ? ( result - adjust ) : ( result + adjust ) ; 
-    }
-    return result;
-}
-
-
-double Support::estimate_CL1() const
-{
-    double n1 = 0;
+    double f1 = 0;
     for ( const auto & pair : fin )
         if ( pair.first == 1 )
         {
-            n1 = pair.second;
+            f1 = pair.second;
             break;
         }
-	
-    double N1 = estimate_plug() / ( 1 - n1/n );
+    return ( estimate_plug() + (n-1.0)/n*f1 );
+}
+
+
+double Support::estimate_CL1() const // for small coefficient of variation
+{
+    double N1 = estimate_TG();
+    double C = coverage_TG();
 
     double sum = 0.0;
     for ( const auto & pair : fin )
-    {
-        int j = pair.first;
-        int fj = pair.second;
-        sum += j * ( j-1 ) * fj;
-        // std::cout<< sum <<" "<<j << " "<<fj<<std::endl;
-    }
-    double h_gamma_sq = std::max( N1 * sum / n / (n-1) , 0.0 );
-	
-    return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
+        sum += pair.first*( pair.first-1 )*pair.second;
+    double gamma_sq = std::max( estimate_TG()*sum/n/(n-1) - 1 , 0.0 );
+    return N1 + n*(1-C)/C*gamma_sq;
 }
 
 
-double Support::estimate_CL2() const
+double Support::estimate_CL2() const // for large coefficient of variation
 {
-    double n1 = 0;
-    for ( const auto & pair : fin )
-        if ( pair.first == 1 )
-        {
-            n1 = pair.second;
-            break;
-        }
-	
-    double N1 = estimate_plug() / ( 1 - n1/n );
-
+    double N1 = estimate_TG();
+    double C = coverage_TG();
+    
     double sum = 0.0;
     for ( const auto & pair : fin )
-    {
-        int j = pair.first;
-        int fj = pair.second;
-        sum += j * ( j-1 ) * fj;
-    }
+        sum += pair.first*( pair.first-1 )*pair.second;
+    double gamma_sq = std::max( estimate_TG()*sum/n/(n-1) - 1 , 0.0 );
+    double gamma_sq2 = std::max( gamma_sq*( 1 + n*(1-C)*sum/n/(n-1)/C ), 0.0 );
 	
-    double h_gamma_sq1 = std::max( N1 * sum / n / (n-1) , 0.0 );
-
-    double h_gamma_sq = std::max( h_gamma_sq1 * ( 1 + n1 * sum / (n-1) / (n-n1) ), 0.0 );
-	
-    return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
+    return N1 + n*(1-C)/C*gamma_sq2;
 }
+
+/* ----------------------END OTHER ESTIMATORS-------------------------------- */
+
+
+
+/* ----------------------OLD ESTIMATORS-------------------------------- */
+
+double Support::estimate_old() const
+{
+    if ( pmin < Ratio / n ) // const
+    {
+        double result = 0.0;
+        for ( const auto & pair : fin )
+            if ( pair.first < N_thr ) 
+            {
+                result += getCoeff_old(pair.first) * pair.second;
+            }
+            else
+            {
+                result += pair.second;
+            }
+        return result;
+    }
+    else
+        return estimate_plug();
+}
+
+double Support::getCoeff_old( double N ) const
+{
+    double rEnd = Ratio / n;
+    double lEnd = pmin;
+    double A = ( rEnd + lEnd ) / ( rEnd - lEnd );
+    double a[L+1];
+	
+    ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
+    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
+    double amp = cheb.evaluate(0); // cos L arccos(-A)
+
+    // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
+    for (unsigned i = 0;i < L+1;i++) a[i] = - a0[i] / amp;
+    a[0] += 1;
+    a[0] = 0;
+    
+    double s = 2 / ( Ratio - n * pmin );
+    // double s = 2 / n / (rEnd-lEnd);
+    double gL = a[L];
+    for (int i = L - 1; i>=0; i--)
+        gL = a[i] + gL * (N-i) * s;
+    return gL;
+}
+
 
 
 double Support::estimate_sinc() const
@@ -234,8 +212,8 @@ double Support::estimate_sinc() const
 	
     return sum;
 }
-/* ----------------------END OTHER ESTIMATORS-------------------------------- */
 
+/* ----------------------END OLD ESTIMATORS-------------------------------- */
 
 
 
