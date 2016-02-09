@@ -33,7 +33,12 @@ double Support::estimate() const
 double Support::getCoeff( int N ) const
 {
     if (N==0) return 0;
-	
+
+    // std::vector<double> a; // 1- cos L arccos( x - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) ) = sum_i a[i]*x^i
+    // void updateArr(); // update a
+    // g(N) = sum_i a[i] * ( 2 / n / (rEnd-lEnd) )^i * (N)_i
+    // N~Poi(np), E[g(N)] = sum_i a[i] * ( 2p/(rEnd-lEnd) )^i = 1- cos L arccos( 2p/(rEnd-lEnd) - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) )
+
     double s = 2 / ( Ratio - n * pmin );
     // double s = 2 / n / (rEnd-lEnd);
     double gL = 1;
@@ -46,7 +51,7 @@ double Support::getCoeff( int N ) const
     double a[L+1];
 	
     ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
-    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
+    std::vector<double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
     double amp = cheb.evaluate(0); // cos L arccos(-A)
 
     // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
@@ -167,7 +172,7 @@ double Support::getCoeff_old( double N ) const
     double a[L+1];
 	
     ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
-    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
+    std::vector<double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
     double amp = cheb.evaluate(0); // cos L arccos(-A)
 
     // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i

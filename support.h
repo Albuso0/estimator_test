@@ -44,16 +44,12 @@ private:
     double pmin;  // =1/k. Minimum non-zero mass
     int L;        // =c0*log(k). Degree of polynomial
     double Ratio; // =c1*log(k). Approximation over [pmin,c1*log(k)/n]
-    int n; // sample size
+    int n;        // sample size
     
-    int N_thr; // =c2*log(k). Used in old estimate_old. Threshold to apply polynomial estimator 
+    int N_thr;    // =c2*log(k). Used in old estimate_old. Threshold to apply polynomial estimator 
 	
-    std::vector< std::pair<int, int> > fin; // Fingerprint(profile). sorted
+    std::vector< std::pair<int, int> > fin; // Fingerprint(profile). Sorted fingerprint preferred
     
-    // std::vector<double> a; // 1- cos L arccos( x - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) ) = sum_i a[i]*x^i
-    // void updateArr(); // update a
-    // g(N) = sum_i a[i] * ( 2 / n / (rEnd-lEnd) )^i * (N)_i
-    // N~Poi(np), E[g(N)] = sum_i a[i] * ( 2p/(rEnd-lEnd) )^i = 1- cos L arccos( 2p/(rEnd-lEnd) - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) )
 };
 
 
