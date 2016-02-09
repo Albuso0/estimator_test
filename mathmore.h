@@ -1,7 +1,10 @@
-#ifndef CHEBMORE_H
-#define CHEBMORE_H
+#ifndef MATHMORE_H
+#define MATHMORE_H
 #include <memory>
 #include <vector>
+
+
+long long binom(unsigned n, unsigned k);
 
 
 class ChebMore  // Polynomial in the form cos(L arccos (bx+c))=sum a_i * x^i
@@ -20,7 +23,6 @@ public:
 private:
     int L;
     double b,c;
-    long long binom(unsigned n, unsigned k) const;
 };
 
 #endif

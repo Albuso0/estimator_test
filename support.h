@@ -3,7 +3,7 @@
 
 #include <map>
 #include <memory>
-#include <boost/shared_array.hpp>
+#include <vector>
 
 class Support
 {

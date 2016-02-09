@@ -1,9 +1,9 @@
-#include "chebmore.h"
+#include "mathmore.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
 
-long long ChebMore::binom(unsigned n, unsigned k) const
+long long binom(unsigned n, unsigned k)
 {
     if (0 == k || n == k) 
         return 1;

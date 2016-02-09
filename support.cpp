@@ -1,10 +1,9 @@
 #include "support.h"
-#include "chebmore.h"
+#include "mathmore.h"
 #include <cmath>
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include <boost/math/special_functions/binomial.hpp>
 
 
 
@@ -205,7 +204,7 @@ double Support::estimate_sinc() const
             for ( int i = 1; 2*i <= j; i++ )
             {
                 multi *= - (3.1415926*k/n) * (3.1415926*k/n);
-                gj += boost::math::binomial_coefficient<double>( j , 2*i ) * multi / (2*i+1);
+                gj += binom( j , 2*i ) * multi / (2*i+1);
             }
             sum += gj * fj;
         }

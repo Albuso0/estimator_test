@@ -2,6 +2,7 @@
 #define DISTVEC_H
 
 #include <vector>
+#include <cmath>
 
 std::vector<double> uniform(int k)
 {

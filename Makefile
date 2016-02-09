@@ -37,7 +37,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = filereader.o	support.o	chebmore.o 	fileofflinereader.o 	stringop.o	samplegen.o	commandline.o	entropy.o	main.o	mainentropy.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	stringop.o	samplegen.o	commandline.o	entropy.o	main.o	mainentropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = entropy		support
@@ -70,8 +70,8 @@ all: $(TARGET)
 entropy: entropy.o samplegen.o commandline.o mainentropy.o
 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
 
-support: support.o samplegen.o commandline.o main.o chebmore.o fileofflinereader.o stringop.o
-	$(LINK) $(LFLAGS) support.o samplegen.o main.o commandline.o chebmore.o fileofflinereader.o stringop.o $(LIBS) -o support
+support: support.o samplegen.o commandline.o main.o mathmore.o fileofflinereader.o stringop.o
+	$(LINK) $(LFLAGS) support.o samplegen.o main.o commandline.o mathmore.o fileofflinereader.o stringop.o $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
@@ -100,11 +100,11 @@ compiler_clean:
 filereader.o: filereader.cpp filereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-support.o: support.cpp support.h chebmore.h
+support.o: support.cpp support.h mathmore.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
 
-chebmore.o: chebmore.cpp chebmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chebmore.o chebmore.cpp
+mathmore.o: mathmore.cpp mathmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
 
 fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
