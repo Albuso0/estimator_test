@@ -5,51 +5,51 @@
 #include <memory>
 #include <boost/shared_array.hpp>
 
-template <typename T>
 class Support
 {
 public:
     Support();
-    Support(int alpha);
+    Support(double pmin);
     virtual ~Support(){}
 
-    // Without the sample splitting required by theory
-    double estimate(); // Hist must be given
-    double estimate_poly();
-    double estimate_plug();
-    double getCoeff( double N ); // compute g(N). Interval must be given through setting rEnd or updating Hist.
 	
     // Direct design, no sample splitting in theory
-    double estimate2();
-    double estimate_poly2();
-    double getCoeff2( double N );
+    double estimate() const;
+    double getCoeff( int N ) const;
 	
     // Other estimators
-    double estimate_TG();
-    double estimate_JK( int order );
-    double estimate_CL1();
-    double estimate_CL2();
-    double estimate_sinc();
+    double estimate_plug() const;
+    double estimate_TG() const;
+    double estimate_JK( int order ) const;
+    double estimate_CL1() const;
+    double estimate_CL2() const;
+    double estimate_sinc() const;
+    double estimate_old() const;
+    double getCoeff_old( double N ) const;
 
 	
-    void setN( int _n ); // set n, update rEnd, a
-    void setCN( double N_threshold ){ c_N = N_threshold; }
-    void setCP( double p_threshold ); // set c_p, if n > 0 update rEnd, a
-    void setCL( double L_threshold ); // set c_L, update L, new a, if n > 0 update a
-    void setHist(std::shared_ptr< const std::map<T, int> > hist); // update n, rEnd = c_p * log(k) / n, a
-    void setFin(std::shared_ptr< const std::map<int, int> > fin);
+    void setPmin( double p_min ) { pmin = p_min; }
+    void setInterval( double rEnd ){ Ratio = rEnd; }
+    void setDegree( int deg ) { L = deg; }
+    void setThreshold( double N_threshold ){ N_thr = N_threshold; }
+    
+    void setFin( std::shared_ptr< const std::map<int, int> > ptr_fin_map );
+    void setHist( const std::vector<int> &hist );
 
-    int getN() { return n; }
-    int getL() { return L; }
+    int getN() const { return n; }
+    int getL() const { return L; }
 private:
-    double c_p, c_N, c_L;
-    int k, L, n;
-    std::shared_ptr< const std::map<int, int> > mpFin;
+    double pmin;  // =1/k. Minimum non-zero mass
+    int L;        // =c0*log(k). Degree of polynomial
+    double Ratio; // =c1*log(k). Approximation over [pmin,c1*log(k)/n]
+    int n; // sample size
+    
+    int N_thr; // =c2*log(k). Used in old estimate_old. Threshold to apply polynomial estimator 
 	
-	
-    double lEnd, rEnd; // end points of interval. lEnd = 1/k, rEnd = c_p * log(k) / n 
-    boost::shared_array<double> a; // 1- cos L arccos( x - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) ) = sum_i a[i]*x^i
-    void updateArr(); // update a
+    std::vector< std::pair<int, int> > fin; // Fingerprint(profile). sorted
+    
+    // std::vector<double> a; // 1- cos L arccos( x - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) ) = sum_i a[i]*x^i
+    // void updateArr(); // update a
     // g(N) = sum_i a[i] * ( 2 / n / (rEnd-lEnd) )^i * (N)_i
     // N~Poi(np), E[g(N)] = sum_i a[i] * ( 2p/(rEnd-lEnd) )^i = 1- cos L arccos( 2p/(rEnd-lEnd) - (rEnd+lEnd)/(rEnd-lEnd) ) / cos L arccos( - (rEnd+lEnd)/(rEnd-lEnd) )
 };

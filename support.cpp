@@ -7,80 +7,104 @@
 #include <boost/math/special_functions/binomial.hpp>
 
 /* ----------------------POLYNOMIAL ESTIMATOR-------------------------------- */
-template <typename T>
-double Support<T>::estimate()
+
+double Support::estimate_old() const
 {
-    if ( n < c_p * k * log(k) ) // const
-        return estimate_poly();
+    if ( pmin < Ratio / n ) // const
+    {
+        double result = 0.0;
+        for ( const auto & pair : fin )
+            if ( pair.first < N_thr ) 
+            {
+                result += getCoeff_old(pair.first) * pair.second;
+            }
+            else
+            {
+                result += pair.second;
+            }
+        return result;
+    }
     else
         return estimate_plug();
 }
 
-template <typename T>
-double Support<T>::estimate_poly()
+double Support::getCoeff_old( double N ) const
 {
-    double result = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
-        if ( it->first < c_N * log(k) ) 
-        {
-            result += getCoeff(it->first) * it->second;
-        }
-        else
-        {
-            result += it->second;
-        }
-    return result;
-}
+    double rEnd = Ratio / n;
+    double lEnd = pmin;
+    double A = ( rEnd + lEnd ) / ( rEnd - lEnd );
+    double a[L+1];
+	
+    ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
+    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
+    double amp = cheb.evaluate(0); // cos L arccos(-A)
 
-template <typename T>
-double Support<T>::getCoeff( double N )
-{
-    double s = 2 / ( c_p * log(k) - n / k );
+    // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
+    for (unsigned i = 0;i < L+1;i++) a[i] = - a0[i] / amp;
+    a[0] += 1;
+    a[0] = 0;
+    
+    double s = 2 / ( Ratio - n * pmin );
     // double s = 2 / n / (rEnd-lEnd);
     double gL = a[L];
     for (int i = L - 1; i>=0; i--)
         gL = a[i] + gL * (N-i) * s;
     return gL;
 }
+
+
 /* ----------------------END POLYNOMIAL ESTIMATOR-------------------------------- */
 
 
+
+
 /* ----------------------POLYNOMIAL ESTIMATOR NO SPLITTING-------------------------------- */
-template <typename T>
-double Support<T>::estimate2()
+double Support::estimate() const
 {
-    if ( n < c_p * k * log(k) ) // const
-        return estimate_poly2();
+    if ( pmin < Ratio / n ) // const
+    {
+        double result = 0.0;
+        for ( const auto & pair : fin )
+            if ( pair.first <= L ) 
+            {
+                result += getCoeff(pair.first) * pair.second;
+            }
+            else
+            {
+                result += pair.second;
+            }
+        return result;
+    }
     else
         return estimate_plug();
 }
 
-template <typename T>
-double Support<T>::estimate_poly2()
-{
-    double result = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
-        if ( it->first <= L ) 
-        {
-            result += getCoeff2(it->first) * it->second;
-        }
-        else
-        {
-            result += it->second;
-        }
-    return result;
-}
-template <typename T>
-double Support<T>::getCoeff2( double N )
+double Support::getCoeff( int N ) const
 {
     if (N==0) return 0;
 	
-    double s = 2 / ( c_p * log(k) - n / k );
+    double s = 2 / ( Ratio - n * pmin );
     // double s = 2 / n / (rEnd-lEnd);
     double gL = 1;
     for ( int i = 1; i <= N; ++i )
         gL *= i * s;
-    return (1+gL*a[(int)N]);
+
+    double rEnd = Ratio / n;
+    double lEnd = pmin;
+    double A = ( rEnd + lEnd ) / ( rEnd - lEnd );
+    double a[L+1];
+	
+    ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
+    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
+    double amp = cheb.evaluate(0); // cos L arccos(-A)
+
+    // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
+    for (unsigned i = 0;i < L+1;i++) a[i] = - a0[i] / amp;
+    a[0] += 1;
+    a[0] = 0;
+
+
+    return (1+gL*a[N]);
 }
 /* ----------------------END POLYNOMIAL ESTIMATOR NO SPLITTING-------------------------------- */
 
@@ -89,53 +113,63 @@ double Support<T>::getCoeff2( double N )
 
 
 /* ----------------------OTHER ESTIMATORS-------------------------------- */
-template <typename T>
-double Support<T>::estimate_plug()
+
+double Support::estimate_plug() const
 {
     double result = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
-        result += it->second;
+    for ( const auto & pair : fin )
+        result += pair.second;
     return result;
 }
 
-template <typename T>
-double Support<T>::estimate_TG()
+
+double Support::estimate_TG() const
 {
-    std::map<int, int>::const_iterator it = mpFin->find( 1 );
-    double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+    double n1 = 0;
+    for ( const auto & pair : fin )
+        if ( pair.first == 1 )
+        {
+            n1 = pair.second;
+            break;
+        }
 	
     return estimate_plug() / ( 1 - n1/n );
 }
 
-template <typename T>
-double Support<T>::estimate_JK( int order )
+
+double Support::estimate_JK( int order ) const
 {
     double result = estimate_plug();
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    for ( const auto & pair : fin )
     {
-        int j = it->first;
+        int j = pair.first;
         if ( j > order )
             break;
-        int nj = it->second;
+        int nj = pair.second;
         int adjust = boost::math::binomial_coefficient<double>( order , j ) * nj;
         result = ( j % 2 == 0 ) ? ( result - adjust ) : ( result + adjust ) ; 
     }
     return result;
 }
 
-template <typename T>
-double Support<T>::estimate_CL1()
+
+double Support::estimate_CL1() const
 {
-    std::map<int, int>::const_iterator it = mpFin->find( 1 );
-    double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+    double n1 = 0;
+    for ( const auto & pair : fin )
+        if ( pair.first == 1 )
+        {
+            n1 = pair.second;
+            break;
+        }
 	
     double N1 = estimate_plug() / ( 1 - n1/n );
 
     double sum = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    for ( const auto & pair : fin )
     {
-        int j = it->first;
-        int fj = it->second;
+        int j = pair.first;
+        int fj = pair.second;
         sum += j * ( j-1 ) * fj;
         // std::cout<< sum <<" "<<j << " "<<fj<<std::endl;
     }
@@ -144,19 +178,24 @@ double Support<T>::estimate_CL1()
     return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
 }
 
-template <typename T>
-double Support<T>::estimate_CL2()
+
+double Support::estimate_CL2() const
 {
-    std::map<int, int>::const_iterator it = mpFin->find( 1 );
-    double n1 = ( it == mpFin->end() ) ? ( 0 ) : ( it->second );
+    double n1 = 0;
+    for ( const auto & pair : fin )
+        if ( pair.first == 1 )
+        {
+            n1 = pair.second;
+            break;
+        }
 	
     double N1 = estimate_plug() / ( 1 - n1/n );
 
     double sum = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    for ( const auto & pair : fin )
     {
-        int j = it->first;
-        int fj = it->second;
+        int j = pair.first;
+        int fj = pair.second;
         sum += j * ( j-1 ) * fj;
     }
 	
@@ -167,15 +206,16 @@ double Support<T>::estimate_CL2()
     return N1 + n * n1 / ( n - n1 ) * h_gamma_sq;
 }
 
-template <typename T>
-double Support<T>::estimate_sinc()
+
+double Support::estimate_sinc() const
 {
     double sum = 0.0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
+    double k = 1.0/pmin;
+    for ( const auto & pair : fin )
     {
-        int j = it->first;
-        int fj = it->second;
-        if ( it->first <= L )
+        int j = pair.first;
+        int fj = pair.second;
+        if ( pair.first <= L )
         {
             double gj = 0;
             double multi = -1.0;
@@ -199,116 +239,50 @@ double Support<T>::estimate_sinc()
 
 
 
-
-template <typename T>
-Support<T>::Support()
+Support::Support()
 {
-    c_p = 1.0;
-    c_N = 0.5;
-    c_L = 1.0;
 }
 
-template <typename T>
-Support<T>::Support(int alpha)
+
+Support::Support(double p_min)
     :Support()
 {
-    k = alpha;
-    n = 0;
-    L = c_L * log(k);
-    a = boost::shared_array<double>(new double[L+1]);
-    lEnd = 1.0 / k;
+    pmin = p_min;
 }
 
-template <typename T>
-void Support<T>::setHist(std::shared_ptr< const std::map<T, int> > hist) 
+void Support::setHist( const std::vector<int> &hist )
 {
-    std::shared_ptr< std::map<int, int> > pHistHist( new std::map<int, int> );
+    fin.clear();
     n = 0;
-    for ( typename std::map<T,int>::const_iterator it = hist->begin(); it != hist->end(); ++it )
+    
+    std::map<int, int> fin_map;
+    for ( const auto & freq : hist )
     {
-        int freq = it->second;
-        n += freq;
-        std::map<int,int>::iterator iter = pHistHist->find( freq );
-        if ( iter == pHistHist->end() )
-            pHistHist->insert( std::pair<int,int>( freq,1 ) );
+        auto iter = fin_map.find( freq );
+        if ( iter == fin_map.end() )
+            fin_map.insert( std::make_pair( freq,1 ) );
         else
             ++(iter->second);
     }
-    mpFin = pHistHist;
-    if ( n > 0 )
+    
+    for ( auto it = fin_map.begin(); it != fin_map.end(); ++it )
     {
-        rEnd = std::min<double>(1, c_p * log(k) / n);
-        updateArr();
+        int freq = it->first, cnt = it->second;
+        fin.push_back( std::make_pair( freq, cnt ) );
+        n += (freq * cnt);
     }
 }
-template <typename T>
-void Support<T>::setFin(std::shared_ptr< const std::map<int, int> > fin) 
+
+
+void Support::setFin(std::shared_ptr< const std::map<int, int> > ptr_fin_map) 
 {
-    mpFin = fin;
+    fin.clear();
     n = 0;
-    for ( std::map<int,int>::const_iterator it = mpFin->begin(); it != mpFin->end(); ++it )
-        n += it->first * it->second;
-    if ( n > 0 )
+    for ( auto it = ptr_fin_map->begin(); it != ptr_fin_map->end(); ++it )
     {
-        rEnd = std::min<double>(1, c_p * log(k) / n);
-        updateArr();
+        int freq = it->first, cnt = it->second;
+        fin.push_back( std::make_pair( freq, cnt ) );
+        n += (freq * cnt);
     }
 }
 
-template <typename T>
-void Support<T>::updateArr() // the array a has length L = c_L * log(k), and depends on lEnd = 1 / k, rEnd = c_p * log(k) / n and L
-{
-    if ( n == 0 ) std::cerr<<"No sample!"<<std::endl;
-    if ( rEnd <= lEnd )
-    {
-        for (unsigned i = 0;i < L+1;i++) a[i] = 0;
-        return;
-    }
-    double A = ( rEnd + lEnd ) / ( rEnd - lEnd );
-	
-    ChebMore cheb(L, 1, -A); // polynomial of cos L arccos(t-A)
-    boost::shared_array<const double> a0 = cheb.expand(); // Expand: cos L arccos(x-A)=sum_i a0[i]*x^i
-    double amp = cheb.evaluate(0); // cos L arccos(-A)
-
-    // Expand: 1- cos L arccos(t-A)/cos L arccos(-A) = sum_i a[i]*x^i
-    for (unsigned i = 0;i < L+1;i++) a[i] = - a0[i] / amp;
-    a[0] += 1;
-    a[0] = 0;
-
-    // for ( int i = 0; i <= L; i++ ) std::cout<<a[i]<<std::endl;
-}
-
-
-
-template <typename T>
-void Support<T>::setN( int _n )
-{
-    n = _n;
-    if ( n > 0 )
-    {
-        rEnd = std::min<double>(1, c_p * log(k) / n);
-        updateArr();
-    }
-}
-template <typename T>
-void Support<T>::setCP( double p_threshold )
-{
-    c_p = p_threshold;
-    if ( n > 0 )
-    {
-        rEnd = std::min<double>(1, c_p * log(k) / n);
-        updateArr();
-    }
-}
-template <typename T>
-void Support<T>::setCL( double L_threshold )
-{
-    c_L = L_threshold;
-    L = c_L * log(k);
-    a = boost::shared_array<double>(new double[L+1]);
-    if ( n > 0 )
-        updateArr();
-}
-
-template class Support<std::string>;
-template class Support<int>;
