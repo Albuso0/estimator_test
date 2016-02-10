@@ -4,7 +4,6 @@
 #include <string>
 #include <map>
 #include <memory>
-#include <boost/shared_array.hpp>
 #include <vector>
 
 
@@ -13,37 +12,36 @@
 class FileOfflineReader
 {
 public:
-	typedef std::shared_ptr<std::map<std::string, int> >  HistPtr;
-	typedef std::shared_ptr<const std::map<std::string, int> >  const_HistPtr;
-	
-    FileOfflineReader();
-	FileOfflineReader(std::string filename);
+    FileOfflineReader(){}
+    FileOfflineReader(std::string filename);
     virtual ~FileOfflineReader(){}
 
-	void reset(){ resetPos(); resetHist(); }
-	void setPos( int _pos ){ pos = _pos; }
-	const_HistPtr getHist() const{ return mpHist; }
-	const_HistPtr randread( int N ); // randomly read N words in the file, return the pointer to updated histogram.
-	const_HistPtr read( int N ); // read the next N words in the file, return the pointer to updated histogram.
-	const_HistPtr read( const std::vector<int> &PosVec ); // read words from position vector
-	int wordN(); // the number of words that have been read
-	int distinctN() { return mpHist->size(); }
+    void reset(){ resetPos(); resetHist(); }
+    void setPos( int _pos ){ pos = _pos; }
+    void setSeed( int seed ){ srand(seed); }
+    
+    void randread( int N );                      // randomly read N words in the file
+    void read( int N );                          // read the next N words in the file
+    void read( const std::vector<unsigned> &PosVec ); // read words from position vector. Index starts from 0
+    
+    std::vector<int> getHist() const;             // return histogram
+    int wordN() const;                            // the number of words read
+    int distinctN() const { return hist.size(); } // the number of distinct words encountered
 
-	int distinctTotal(){ return distinctT; } // total number of distinct words
-	int wordTotal(){ return wordT; } // total number of words
+    int distinctTotal() const;                          // the total number of distinct words over the whole file
+    int wordTotal() const { return words.size(); }      // the total number of words over the whole file
 protected:
-	void resetPos() { pos = 0; }
-	void resetHist(){ mpHist->clear(); }
+    void resetPos() { pos = 0; }
+    void resetHist(){ hist.clear(); }
 	
 private:
-	HistPtr mpHist;
-	boost::shared_array<std::string> words;
-	int pos;
-	int wordT;
-	int distinctT;
-	void addWord(std::string word);
-
-	std::string stdString(std::string word); // standarderize the input word 
+    std::map<std::string, int> hist;
+    
+    std::vector<std::string> words;
+    unsigned pos;
+    
+    void addWord(std::string word);
+    std::string stdString(std::string word) const; // standarderize the input word 
 	
 };
 

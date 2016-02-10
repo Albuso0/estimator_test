@@ -15,14 +15,12 @@ public:
     void reset(){ hist.clear(); }
     void setSeed(int _seed){ generator.seed( _seed ); }
 	
-    void discrete(int n, std::vector<double>* p);
+    void discrete(int n, const std::vector<double>& p);
+    std::vector<int> getHist() const;
 
     void uniform(int n, int k);  // generate n samples from Uniform[0:k-1] and update histogram
     void Poisson_truncated(int n, double lamdba, int min, int max);  // generate n samples from truncated Poi(lambda) and update histogram
     void negative_binomial(int n, int k, double p);
-
-    std::vector<int> getHist() const;
-
 private:
     std::default_random_engine generator;
     std::map<int, int> hist;

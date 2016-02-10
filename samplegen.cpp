@@ -23,9 +23,9 @@ void SampleGen::Poisson_truncated(int n, double lamdba, int min, int max)
     sampling_truncate( distribution, n, min, max);
 }
 
-void SampleGen::discrete(int n, std::vector<double>* p)
+void SampleGen::discrete(int n, const std::vector<double> &p)
 {
-    std::discrete_distribution<int> distribution ( p->begin(),p->end() );
+    std::discrete_distribution<int> distribution ( p.begin(),p.end() );
     sampling( distribution, n );
 }
 
