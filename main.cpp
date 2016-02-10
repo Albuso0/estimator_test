@@ -1,22 +1,18 @@
-#include "support.h"
-#include "distvec.h"
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <vector>
+#include "support.h"
+#include "mathmore.h"
 #include "commandline.h"
 
+#include "distvec.h"
 #include "samplegen.h"
 #include "fileofflinereader.h"
 
 
-void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double cL, double cp );
-void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double cL, double cp );
 
-double rmse( std::vector<int> v, int truth );
-double stdev( std::vector<int> v );
-double mean( std::vector<int> v );
-double min_positive( const std::vector<double> &p ); // p may not be normalized.
+void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double degree, double interval );
+void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double degree, double interval );
 
 int main(int argc, char *argv[])
 {
@@ -27,33 +23,31 @@ int main(int argc, char *argv[])
     cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
     cmd.Parse (argc, argv);
     
+    std::vector<double> p;
+    p = mix(1000000);
+    pmin = min_positive_normalized(p);
+    exp_discrete( p, pmin, 50000, 10, cL*log(1.0/pmin), cp*log(1.0/pmin) );
     
-
-    // std::vector<double> p;
-    // p = uniform(k);
-    // pmin = min_positive(p);
-    // exp_discrete( p, pmin, 50000, 10, cL, cp );
-    
-    std::string filename = "hamlet.txt";
-    pmin = 1.0/32000;
-    exp_file( filename, pmin, 1000, 32, cL, cp );
+    // std::string filename = "hamlet.txt";
+    // pmin = 1.0/32000;
+    // exp_file( filename, pmin, 1000, 32, cL*log(1.0/pmin), cp*log(1.0/pmin) );
 
     return 0;
 }
 
 
-void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double cL, double cp  )
+void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double degree, double interval  )
 {
-    SampleGen gen;
-	
-    int truth = p.size();
-
-    Support support( pmin ); // set 1/p_min
-    support.setInterval(cp* log(1.0/pmin)); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
-    support.setDegree(cL*log(1.0/pmin)); // L = c_L * log(k) and plug-in if N>L
+    int truth = cnt_positive(p);
+    
+    Support support( pmin ); // set pmin
+    support.setInterval( interval ); // Approximation interval is [1/k, interval/n ]
+    support.setDegree( degree ); // Polynomial degree. Plug-in if N>L
 
     int trials = 1;
     std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
+    
+    SampleGen gen;
     for ( int seed = 0; seed < trials; ++seed )
     {
         gen.reset();
@@ -106,17 +100,18 @@ void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, d
 
 
 
-void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double cL, double cp )
+void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double degree, double interval )
 {
     FileOfflineReader f( filename );
     int truth = f.distinctTotal();
 
-    Support support( pmin ); // set 1/p_min
-    support.setInterval(cp* log(1.0/pmin)); // Approximation interval is [1/k, min{ 1, c_p * log(k) / n }]
-    support.setDegree(cL*log(1.0/pmin)); // L = c_L * log(k) and plug-in if N>L
+    Support support( pmin ); // set pmin
+    support.setInterval( interval ); // Approximation interval is [1/k, interval/n ]
+    support.setDegree( degree ); // Polynomial degree. Plug-in if N>L
 	
     int trials = 50;
     std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
+    
     for ( int seed = 0; seed < trials; ++seed )
     {
         f.reset();
@@ -169,37 +164,3 @@ void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double 
 
 
 
-double mean( std::vector<int> v)
-{
-    return (std::accumulate(v.begin(), v.end(), 0.0) * 1.0 / v.size()); 
-}
-
-double rmse( std::vector<int> v, int truth )
-{
-    double sum = 0;
-    for ( const auto &x : v )
-        sum += 1.0*(x-truth)*(x-truth);
-    return sqrt( sum / v.size() );
-}
-
-double stdev( std::vector<int> v )
-{
-    double sum = std::accumulate(v.begin(), v.end(), 0.0);
-    double mean = sum / v.size();
-
-    std::vector<double> diff(v.size());
-    std::transform(v.begin(), v.end(), diff.begin(), std::bind2nd(std::minus<double>(), mean));
-    double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
-    return std::sqrt(sq_sum / (v.size()-1) );
-}
-
-
-double min_positive( const std::vector<double> &p ) // p may not be normalized.
-{
-    double sum = std::accumulate(p.begin(), p.end(), 0.0);
-    double min = 1.0;
-    for ( const auto &x : p )
-        if ( (x>0) && (x/sum < min) )
-            min = x/sum;
-    return min;
-}
