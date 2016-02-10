@@ -70,8 +70,8 @@ all: $(TARGET)
 entropy: entropy.o samplegen.o commandline.o mainentropy.o
 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
 
-support: support.o samplegen.o commandline.o main.o mathmore.o fileofflinereader.o stringop.o
-	$(LINK) $(LFLAGS) support.o samplegen.o main.o commandline.o mathmore.o fileofflinereader.o stringop.o $(LIBS) -o support
+support: support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o
+	$(LINK) $(LFLAGS) support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
