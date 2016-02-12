@@ -97,10 +97,12 @@ printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)
                mean(CL2[i]), stdev(CL2[i]), rmse(CL2[i], truth)
             );
     }
-    
+
+
+    /*------------TEST ON HAMLET----------------------*/
     // pmin = 1.0/32000;
     // exp_file( "hamlet.txt", pmin, 1000, 32, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
-    // break;
+    /*------------END TEST ON HAMLET----------------------*/
 
     return 0;
 }
@@ -119,8 +121,11 @@ void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double 
     support.setDegree( degree ); // Polynomial degree. Plug-in if N>L
 	
     printf("Support size\t\t=%d\n",truth);
-    printf("Minimum non-zero mass\t=%.2e\n",pmin);
-    std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
+    printf("pmin value in estimator\t=%.2e\n", support.getPmin());
+    printf("Degree of polynomial\t=%d\n", support.getDegree());
+    printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
+    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
+   std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
     for ( int seed = 0; seed < trials; ++seed )
     {
         f.reset();
@@ -138,7 +143,6 @@ void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double 
         }
     }
     
-    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
     int n = 0; 
     for ( int i = 0; i < n_cnt; i++)
     {
