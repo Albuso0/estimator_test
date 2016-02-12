@@ -11,74 +11,60 @@
 
 
 
-void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double degree, double interval, int trials );
 void exp_file( std::string filename, double pmin, int n_step, int n_cnt, double degree, double interval, int trials );
 
 int main(int argc, char *argv[])
 {
-    double pmin;
-    double cL = 0.8, cp = 1;
+    double pmin = 1e-6;
+    double cL = 0.56, cp = 0.5;
     int exp = 0;
     int trials = 50;
+    int n_step = 5e4, n_cnt = 20;
     std::CommandLine cmd;
+    cmd.AddValue ("pmin",  "pmin", pmin);
     cmd.AddValue ("cL",  "L=cL log k", cL);
     cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
     cmd.AddValue ("exp",  "experiment type", exp);
     cmd.AddValue ("trials",  "number of trials", trials);
     cmd.Parse (argc, argv);
+
+    Support support( pmin ); // set pmin
+    support.setInterval( cL*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
+    support.setDegree( cp*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
+
+
     
     std::vector<double> p;
-    int k = 1000000;
     switch(exp)
     {
     case 0:
-        p = uniform(k);
-        pmin = min_positive_normalized(p);
-        exp_discrete( p, pmin, 50000, 20, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+        p = uniform(1e6);
         break;
     case 1:
-        p = mix(k);
-        pmin = min_positive_normalized(p);
-        exp_discrete( p, pmin, 50000, 20, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+        p = mix(0.5e6);
         break;
     case 2:
-        p = zipf(k);
-        pmin = min_positive_normalized(p);
-        exp_discrete( p, pmin, 50000, 20, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+        p = zipf(83928);
         break;
     case 3:
-        p = zipfd5(k);
-        pmin = min_positive_normalized(p);
-        exp_discrete( p, pmin, 50000, 20, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+        p = zipfd5(500516);
         break;
     case 4:
-        p = mixgeozipf(1000000);
-        pmin = min_positive_normalized(p);
-        exp_discrete( p, pmin, 50000, 20, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
-        break;
-    case 5:
-        pmin = 1.0/32000;
-        exp_file( "hamlet.txt", pmin, 1000, 32, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+        p = mixgeozipf(88677);
         break;
     default:
         break;
     }
-    
-
-    return 0;
-}
-
-
-void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, double degree, double interval, int trials  )
-{
+    // pmin = min_positive_normalized(p);
+    // std::cout<<pmin<<std::endl;
     int truth = cnt_positive(p);
-    
-    Support support( pmin ); // set pmin
-    support.setInterval( interval ); // Approximation interval is [1/k, interval/n ]
-    support.setDegree( degree ); // Polynomial degree. Plug-in if N>L
-
     printf("Support size\t\t=%d\n",truth);
-    printf("Minimum non-zero mass\t=%.2e\n",pmin);
+    printf("Minimum non-zero mass\t=%.2e\n",min_positive_normalized(p));
+    printf("pmin value in estimator\t=%.2e\n", support.getPmin());
+    printf("Degree of polynomial\t=%d\n", support.getDegree());
+    printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
+printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
+
     std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
     SampleGen gen;
     for ( int seed = 0; seed < trials; ++seed )
@@ -98,7 +84,6 @@ void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, d
         }
     }
 
-    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
     int n = 0; 
     for ( int i = 0; i < n_cnt; i++)
     {
@@ -112,7 +97,14 @@ void exp_discrete( std::vector<double> &p, double pmin, int n_step, int n_cnt, d
                mean(CL2[i]), stdev(CL2[i]), rmse(CL2[i], truth)
             );
     }
+    
+    // pmin = 1.0/32000;
+    // exp_file( "hamlet.txt", pmin, 1000, 32, cL*log(1.0/pmin), cp*log(1.0/pmin), trials );
+    // break;
+
+    return 0;
 }
+
 
 
 

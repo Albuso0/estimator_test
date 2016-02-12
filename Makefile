@@ -121,7 +121,7 @@ commandline.o: commandline.cpp commandline.h
 entropy.o: entropy.cpp entropy.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
 
-main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h
+main.o: main.cpp filereader.h support.h fileofflinereader.h samplegen.h	distvec.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mainentropy.o: mainentropy.cpp entropy.h samplegen.h

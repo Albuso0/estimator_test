@@ -38,8 +38,11 @@ public:
     void setFin( std::shared_ptr< const std::map<int, int> > ptr_fin_map );
     void setHist( const std::vector<int> &hist );
 
-    int getN() const { return n; }
-    int getL() const { return L; }
+    double getPmin() const{ return pmin; }
+    int getDegree() const{ return L; }
+    double getInterval() const{ return Ratio; }
+    int getSampleSize() const{ return n; }
+    int getThreshold() const{ return N_thr; }
 private:
     double pmin;  // =1/k. Minimum non-zero mass
     int L;        // =c0*log(k). Degree of polynomial
