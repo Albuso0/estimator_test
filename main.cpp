@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
     support.setDegree( cp*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
 
 
+    // support.setFin( "fin-spe.txt" );
+    // std::cout<<support.estimate()+846<<std::endl;
     
     std::vector<double> p;
     switch(exp)
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
     printf("pmin value in estimator\t=%.2e\n", support.getPmin());
     printf("Degree of polynomial\t=%d\n", support.getDegree());
     printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
-printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
+    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
 
     std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
     SampleGen gen;

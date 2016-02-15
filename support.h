@@ -35,8 +35,14 @@ public:
     void setDegree( int deg ) { L = deg; }
     void setThreshold( double N_threshold ){ N_thr = N_threshold; }
     
-    void setFin( std::shared_ptr< const std::map<int, int> > ptr_fin_map );
+    // set fingerprint, also update sample size
+    void setFin( std::shared_ptr< const std::map<int, int> > ptr_fin_map ); 
+    void setFin( const std::string filename );
+    void setFin( const std::vector<int> &freq, const std::vector<int> &cnt );
+    // set fingerprint through histogram, also update sample size
     void setHist( const std::vector<int> &hist );
+    void setHist( const std::string filename );
+    
 
     double getPmin() const{ return pmin; }
     int getDegree() const{ return L; }
