@@ -70,8 +70,8 @@ all: $(TARGET)
 entropy: entropy.o samplegen.o commandline.o mainentropy.o
 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
 
-support: support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o
-	$(LINK) $(LFLAGS) support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o $(LIBS) -o support
+support: support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o histreader.o
+	$(LINK) $(LFLAGS) support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o histreader.o $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
@@ -100,12 +100,6 @@ compiler_clean:
 filereader.o: filereader.cpp filereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-support.o: support.cpp support.h mathmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
-
-mathmore.o: mathmore.cpp mathmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
-
 fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
 
@@ -115,8 +109,20 @@ stringop.o: stringop.cpp stringop.h
 samplegen.o: samplegen.cpp samplegen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
 
+histreader.o: histreader.cpp histreader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o histreader.o histreader.cpp
+
+
+
+
 commandline.o: commandline.cpp commandline.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
+
+support.o: support.cpp support.h mathmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
+
+mathmore.o: mathmore.cpp mathmore.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
 
 entropy.o: entropy.cpp entropy.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp

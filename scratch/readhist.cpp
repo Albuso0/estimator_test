@@ -6,16 +6,16 @@
 #include "support.h"
 #include "mathmore.h"
 #include "commandline.h"
-
+#include "histreader.h"
 
 #include <dirent.h>
-
+#include <random>
 
 int main(int argc, char *argv[])
 {
-    double pmin = 1.0/1e6;
+    double pmin = 1.0/50e6;
     double cL = 0.56, cp = 0.5;
-    std::string dirname = "/home/Albus/Dropbox/Work/pengkun/support/1989_hist/";
+    std::string dirname = "/home/Albus/Documents/NYT/1989_hist_articles/";
     
     std::CommandLine cmd;
     cmd.AddValue ("pmin",  "pmin", pmin);
@@ -43,46 +43,44 @@ int main(int argc, char *argv[])
         }
     }
 
+    int seed = 0;
+    int n_cnt = 20, n_step = 4000;
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0,files.size()-1);
+    generator.seed( seed );
+
     
-
-    std::map<std::string, int> hist;
-    std::cout<<"Samples\tPlug-in\tPolynomial\tGood-Turing\n";
-    for( auto name : files )
+	
+    HistReader hist;
+    std::cout<<"Samples\tPlug-in\tPoly\tGood-Turing\n";
+    for( int i = 0; i < n_cnt; i++)
     {
-        std::string filename = dirname+name;
+        for (int j = 0; j < n_step; j++)
         {
-            // std::cout<<filename<<std::endl;
-            std::ifstream infile;
-            infile.open( filename.c_str() );
-
-            std::string data;
-            int cnt;
-            while ( (infile >> data).good() )
-            {
-                infile >> cnt;
-                auto it = hist.find( data );
-                if ( it == hist.end() )
-                    hist.insert( std::make_pair( data ,cnt ) );
-                else
-                    it->second += cnt;
-            }
-            infile.close();
+            auto name = files[ distribution(generator) ];
+            // auto name = files[ n_step*i + j ];
+            hist.addHist(dirname+name);
         }
         
-        std::vector<int> freq;
-        for( const auto & pair:hist )
-        {
-            // std::cout<<pair.second<<std::endl;
-            freq.push_back(pair.second);
-        }
-        
-        support.setHist( freq );
+        support.setHist( hist.getHist() );
         std::cout<<support.getSampleSize()<<"\t"
                  <<(int)support.estimate_plug()<<"\t"
                  <<(int)support.estimate()<<"\t"
                  <<(int)support.estimate_TG()<<"\t"
                  <<std::endl;
     }
+
+    // std::vector< std::pair<int, int> > fin = support.getFin();
+    // for (int i = 0; i<8; ++i)
+    // {
+    //     int freq = fin[i].first, cnt = fin[i].second;
+    //     double gL = support.getCoeff(freq);
+    //     std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
+    // }
+    // int cnt = 0;
+    // for (int i = 8; i<fin.size(); ++i)
+    //     cnt += fin[i].second;
+    // std::cout<<cnt<<"\n";
 
     return 0;
 }

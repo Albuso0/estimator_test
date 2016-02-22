@@ -49,6 +49,7 @@ public:
     double getInterval() const{ return Ratio; }
     int getSampleSize() const{ return n; }
     int getThreshold() const{ return N_thr; }
+    std::vector< std::pair<int, int> > getFin() const {return fin;} // get a copy of fingerprint
 private:
     double pmin;  // =1/k. Minimum non-zero mass
     int L;        // =c0*log(k). Degree of polynomial

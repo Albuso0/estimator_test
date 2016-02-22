@@ -38,7 +38,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = $(patsubst %.o,../%.o,support.o mathmore.o commandline.o samplegen.o fileofflinereader.o)	## dependent on .o files here
+OBJECTS       = $(patsubst %.o,../%.o,support.o mathmore.o commandline.o samplegen.o fileofflinereader.o histreader.o)	## dependent on .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = main	synthetic	readfile	readhist
@@ -77,7 +77,7 @@ synthetic: ../support.o ../mathmore.o ../commandline.o synthetic.o
 readfile: ../support.o ../mathmore.o ../commandline.o readfile.o
 	$(LINK) $(LFLAGS) $(OBJECTS) readfile.o $(LIBS) -o readfile
 
-readhist: ../support.o ../mathmore.o ../commandline.o readhist.o
+readhist: ../support.o ../mathmore.o ../commandline.o ../histreader.o readhist.o
 	$(LINK) $(LFLAGS) $(OBJECTS) readhist.o $(LIBS) -o readhist
 
 # $(TARGET):  $(OBJECTS)  
