@@ -37,7 +37,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	stringop.o	samplegen.o	commandline.o	entropy.o	main.o	mainentropy.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	fileofflinelinereader.o	stringop.o	samplegen.o	commandline.o	entropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = entropy		support
@@ -70,8 +70,8 @@ all: $(TARGET)
 entropy: entropy.o samplegen.o commandline.o mainentropy.o
 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
 
-support: support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o histreader.o
-	$(LINK) $(LFLAGS) support.o mathmore.o commandline.o main.o samplegen.o fileofflinereader.o histreader.o $(LIBS) -o support
+support: $(OBJECTS)
+	$(LINK) $(LFLAGS) main.o $(OBJECTS) $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
@@ -100,8 +100,11 @@ compiler_clean:
 filereader.o: filereader.cpp filereader.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o filereader.o filereader.cpp
 
-fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h
+fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h hister.h hister.tpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinereader.o fileofflinereader.cpp
+
+fileofflinelinereader.o: fileofflinelinereader.cpp fileofflinelinereader.h hister.h hister.tpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinelinereader.o fileofflinelinereader.cpp
 
 stringop.o: stringop.cpp stringop.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp

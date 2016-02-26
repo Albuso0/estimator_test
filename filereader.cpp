@@ -2,136 +2,102 @@
 #include <iterator>
 #include <set>
 #include "filereader.h"
-#include "stringop.h"
 
-std::string FileReader::stdString(std::string word)
-{
-	StringOp::removepunc(word);
-	StringOp::tolower(word);
-	return word;
-}
 
-FileReader::const_HistPtr FileReader::read(int N)
-{
-	std::string word;
-	for ( int i = 0; i < N;  ++i )
-	{
-		if ( (*mpFile) >> word )
-		{
-			word = stdString(word);
-			addWord(word);
-		}
-		else
-		{
-			break;
-		}
-	}
-	return mpHist;
-}
 void FileReader::addWord(std::string word)
 {
-	std::map<std::string,int>::iterator it = mpHist->find( word );
-	if ( it == mpHist->end() )
-		mpHist->insert( std::pair<std::string,int>( word,1 ) );
-	else
-		++(it->second);
-}
-
-int FileReader::wordN()
-{
-	int sum = 0;
-	for ( std::map<std::string,int>::iterator it = mpHist->begin(); it != mpHist->end(); ++it )
-		sum += it->second;
-	return sum;
+    auto it = hist.find( word );
+    if ( it == hist.end() )
+        hist.insert( std::pair<std::string,int>( word,1 ) );
+    else
+        ++(it->second);
 }
 
 
-FileReader::const_HistPtr FileReader::hist()
+/* -------------------- READ FILE -----------------------*/
+void FileReader::read(unsigned long long N)
 {
-	saveState();
-	resetState();
-	FileReader::HistPtr pCompleteHist ( new std::map<std::string, int> );
-	std::istream_iterator<std::string> in(*mpFile), end;
-	for (; in != end; ++in)
-	{
-		std::string word = stdString(*in);
-		std::map<std::string,int>::iterator it = pCompleteHist->find( word );
-		if ( it == pCompleteHist->end() )
-			pCompleteHist->insert( std::pair<std::string,int>( word,1 ) );
-		else
-			++(it->second);
-	}
-	loadState();
-	return pCompleteHist;
+    std::string word;
+    for ( unsigned long long i = 0; i < N;  ++i )
+    {
+        if ( (infile >> word).good() )
+            addWord(word);
+        else
+            break;
+    }
+}
+/* -------------------- END READ FILE -----------------------*/
+
+
+std::vector<int> FileReader::getHist() const
+{
+    std::vector<int> out_hist;
+    for ( const auto & pair : hist )
+        out_hist.push_back( pair.second );
+    return out_hist;
 }
 
-int FileReader::distinctTotal()
+
+unsigned long long FileReader::wordN()
 {
-	saveState();
-	resetState();
-	std::istream_iterator<std::string> in(*mpFile), end;
-	std::set<std::string> words;
-	for (; in != end; ++in)
-	{
-		words.insert(stdString(*in));
-	}
-	loadState();
-	return words.size();
+    unsigned long long sum = 0;
+    for ( const auto & pair : hist )
+        sum += pair.second;
+    return sum;	
 }
-int FileReader::wordTotal()
+
+
+
+unsigned long long FileReader::distinctTotal()
 {
-	saveState();
-	resetState();
-	std::istream_iterator<std::string> in(*mpFile), end;
-	int count = std::distance(in, end);
-	loadState();
+    saveState();
+    resetState();
+    std::istream_iterator<std::string> in(infile), end;
+    std::set<std::string> words;
+    for (; in != end; ++in)
+    {
+        words.insert(*in);
+    }
+    loadState();
+    return words.size();
+}
+
+unsigned long long FileReader::wordTotal()
+{
+    saveState();
+    resetState();
+    std::istream_iterator<std::string> in(infile), end;
+    int count = std::distance(in, end);
+    loadState();
 	
-	return count;
+    return count;
 }
-void FileReader::wordRepeat()
-{
-	saveState();
-	resetState();
-	std::istream_iterator<std::string> in(*mpFile), end;
-	for (; in != end; ++in)
-	{
-		std::cout << *in<<" ";
-	}
-	std::cout << std::endl;
-	loadState();
-}
-
-
 
 void FileReader::saveState()
 {
-	fState = mpFile->rdstate();
-	fPos = mpFile->tellg();
+    fState = infile.rdstate();
+    fPos = infile.tellg();
 }
 void FileReader::resetState()
 {
-	mpFile->clear();
-	mpFile->seekg(0);
+    infile.clear();
+    infile.seekg(0);
 }
 void FileReader::loadState()
 {
-	mpFile->clear( (std::ios_base::iostate)fState );
-	mpFile->seekg(fPos);
+    infile.clear( (std::ios_base::iostate)fState );
+    infile.seekg(fPos);
 }
 
-FileReader::FileReader()
-	:mpFile(new std::ifstream),
-	 mpHist(new std::map<std::string, int>)
-{}
 
 FileReader::FileReader(std::string filename)
-	:FileReader()
+    :FileReader()
 {
-	mpFile->open( filename.c_str() );
+    infile.open( filename.c_str() );
 }
 
 FileReader::~FileReader()
 {
-	mpFile->close();
+    infile.close();
 }
 

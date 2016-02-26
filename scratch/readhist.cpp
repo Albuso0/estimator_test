@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[])
 {
-    double pmin = 1.0/50e6;
+    double pmin = 1.0/1e5;
     double cL = 0.56, cp = 0.5;
     std::string dirname = "/home/Albus/Documents/NYT/1989_hist_articles/";
     
@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
     
 	
     HistReader hist;
+    printf("pmin value in estimator\t=%.2e\n", support.getPmin());
+    printf("Degree of polynomial\t=%d\n", support.getDegree());
+    printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
     std::cout<<"Samples\tPlug-in\tPoly\tGood-Turing\n";
     for( int i = 0; i < n_cnt; i++)
     {
@@ -70,17 +73,19 @@ int main(int argc, char *argv[])
                  <<std::endl;
     }
 
-    // std::vector< std::pair<int, int> > fin = support.getFin();
-    // for (int i = 0; i<8; ++i)
-    // {
-    //     int freq = fin[i].first, cnt = fin[i].second;
-    //     double gL = support.getCoeff(freq);
-    //     std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
-    // }
-    // int cnt = 0;
-    // for (int i = 8; i<fin.size(); ++i)
-    //     cnt += fin[i].second;
-    // std::cout<<cnt<<"\n";
+    
+    std::vector< std::pair<int, int> > fin = support.getFin();
+    int cutoff = support.getDegree();
+    for (int i = 0; i<cutoff; ++i)
+    {
+        int freq = fin[i].first, cnt = fin[i].second;
+        double gL = support.getCoeff(freq);
+        std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
+    }
+    int cnt = 0;
+    for (int i = cutoff; i<fin.size(); ++i)
+        cnt += fin[i].second;
+    std::cout<<cnt<<"\n";
 
     return 0;
 }

@@ -5,47 +5,43 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <vector>
 
 // FileReader can read a file can generate histogram of words in the file.
 // This is an online reader, we do not require memory to store all huge file.
 class FileReader
 {
 public:
-	typedef std::shared_ptr<std::map<std::string, int> >  HistPtr;
-	typedef std::shared_ptr<const std::map<std::string, int> >  const_HistPtr;
-	
-    FileReader();
-	FileReader(std::string filename);
+    FileReader(){}
+    FileReader(std::string filename);
     virtual ~FileReader();
 
-	void reset(){ resetHist(); resetFile(); }
-	const_HistPtr getHist() const{ return mpHist; }
-	const_HistPtr read(int N); // read the next N words in the file, return the pointer to updated histogram.
-	int wordN(); // the number of words that have been read
-	int distinctN() { return mpHist->size(); }
+    void reset(){ resetHist(); resetFile(); }
+    
+    void read(unsigned long long N); // read the next N words in the file, return the pointer to updated histogram.
 
-	int distinctTotal(); // total number of distinct words
-	int wordTotal(); // total number of words
+    std::vector<int> getHist() const;             // return histogram
+
+    unsigned long long wordN(); // the number of words that have been read
+    unsigned long long distinctN() { return hist.size(); }
+
+    unsigned long long distinctTotal(); // total number of distinct words
+    unsigned long long wordTotal(); // total number of words
 protected:
-	void resetHist(){ mpHist->clear(); }
-	void resetFile(){ resetState(); }
-	// Test the whole file
-	const_HistPtr hist(); // histogram of all words
-	void wordRepeat(); // repeart the file wordwise
+    void resetHist(){ hist.clear(); }
+    void resetFile(){ resetState(); }
 	
 private:
-	std::ifstream* mpFile;
-	HistPtr mpHist;
-	void addWord(std::string word);
+    std::ifstream infile;
+    std::map<std::string, int> hist;
 
-	std::string stdString(std::string word); // standarderize the input word 
-	
-	// process the state inside the ifstream mpFile
-	void saveState();
-	void resetState();
-	void loadState();
-	int fState;
-	int fPos;
+    void addWord(std::string word);
+
+    // process the state inside the ifstream mpFile
+    void saveState();
+    void resetState();
+    void loadState();
+    int fState, fPos;
 };
 
 
