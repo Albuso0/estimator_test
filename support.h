@@ -40,7 +40,7 @@ public:
     void setFin( const std::string filename );
     void setFin( const std::vector<int> &freq, const std::vector<int> &cnt );
     // set fingerprint through histogram, also update sample size
-    void setHist( const std::vector<int> &hist );
+    void setHist( const std::vector<unsigned> &hist );
     void setHist( const std::string filename );
     
 

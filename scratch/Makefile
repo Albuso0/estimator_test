@@ -5,13 +5,13 @@ MAKEFILE      = Makefile
 CC            = gcc
 CXX           = g++
 DEFINES       = -std=c++14 # -Wextra -pedantic
-CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
-CXXFLAGS      = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
+CFLAGS        = -O2 -Wall $(DEFINES)
+CXXFLAGS      = -O2 -Wall $(DEFINES)
 INCPATH       = -I. -I../
 LINK          = g++
 LINKPATH       = -L../
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -lpthread 
+LIBS          = $(SUBLIBS) 
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -38,7 +38,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = $(patsubst %.o,../%.o,support.o mathmore.o commandline.o samplegen.o fileofflinereader.o fileofflinelinereader.o filereader.o histreader.o)	## dependent on .o files here
+OBJECTS       = $(patsubst %.o,../%.o,support.o mathmore.o commandline.o samplegen.o fileofflinereader.o fileofflinelinereader.o filereader.o)	## dependent on .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = main	synthetic	readfile	readhist

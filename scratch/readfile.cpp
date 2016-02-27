@@ -2,8 +2,8 @@
 #include <fstream>
 #include <vector>
 #include "support.h"
-#include "mathmore.h"
 #include "commandline.h"
+#include "mathmore.h"
 
 #include "fileofflinereader.h"
 #include "fileofflinelinereader.h"
@@ -14,26 +14,23 @@
 int main(int argc, char *argv[])
 {
     double pmin = 1.0/50e6;
-    double cL = 0.56, cp = 0.5;
     int trials = 50;
-    unsigned long n_step = 40000, n_cnt = 30;
-    std::string filename = "/home/Albus/Data_disk/NYT/1989_whole_paragraphs.txt";
+    unsigned long n_step = 1000000, n_cnt = 40;
+    std::string filename = "/homes/pyang14/1989_whole_paragraphs.txt";
     std::CommandLine cmd;
     cmd.AddValue ("pmin",  "pmin", pmin);
-    cmd.AddValue ("cL",  "L=cL log k", cL);
-    cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
     cmd.AddValue ("trials",  "number of trials", trials);
     cmd.Parse (argc, argv);
 
 
-    // FileOfflineReader f( filename );
-    FileOfflineLineReader f( filename );
-    std::cout<<f.distinctTotal()<<"\n";
-    std::cout<<f.linesTotal()<<"\n";
+    FileOfflineReader f( filename );
+    // FileOfflineLineReader f( filename );
+    // std::cout<<f.distinctTotal()<<"\n";
+    // std::cout<<f.linesTotal()<<"\n";
     
     Support support( pmin ); // set pmin
-    support.setInterval( cL*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
-    support.setDegree( cp*log(1.0/pmin) ); // Polynomial degree. Plug-in if N>L
+    // support.setDegree( 0.5*log(1.0/pmin) ); // Polynomial degree. Plug-in if N>L
+    // support.setInterval( 0.56*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
 
     f.reset();
     f.setSeed(0);
@@ -106,17 +103,17 @@ int main(int argc, char *argv[])
 
 
     
-    std::vector< std::pair<int, int> > fin = support.getFin();
-    for (int i = 0; i<8; ++i)
-    {
-        int freq = fin[i].first, cnt = fin[i].second;
-        double gL = support.getCoeff(freq);
-        std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
-    }
-    int cnt = 0;
-    for (unsigned i = 8; i<fin.size(); ++i)
-        cnt += fin[i].second;
-    std::cout<<cnt<<"\n";
+    // std::vector< std::pair<int, int> > fin = support.getFin();
+    // for (int i = 0; i<8; ++i)
+    // {
+    //     int freq = fin[i].first, cnt = fin[i].second;
+    //     double gL = support.getCoeff(freq);
+    //     std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
+    // }
+    // int cnt = 0;
+    // for (unsigned i = 8; i<fin.size(); ++i)
+    //     cnt += fin[i].second;
+    // std::cout<<cnt<<"\n";
 
     return 0;
 }

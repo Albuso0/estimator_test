@@ -1,10 +1,12 @@
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <string>
 
 template <typename T>
-std::vector<int> Hister<T>::getHist() const
+std::vector<unsigned> Hister<T>::getHist() const
 {
-    std::vector<int> out_hist;
+    std::vector<unsigned> out_hist;
     for ( const auto & pair : hist )
         out_hist.push_back( pair.second );
     return out_hist;
@@ -21,9 +23,9 @@ void Hister<T>::printHist() const
 
 
 template <typename T>
-std::size_t Hister<T>::samplesN() const
+unsigned Hister<T>::samplesN() const
 {
-    std::size_t sum = 0;
+    unsigned sum = 0;
     for ( const auto & pair : hist )
         sum += pair.second;
     return sum;	
@@ -34,7 +36,7 @@ void Hister<T>::addSample(T sample)
 {
     auto it = hist.find( sample );
     if ( it == hist.end() )
-        hist.insert( std::pair<T,int>( sample,1 ) );
+        hist.insert( std::pair<T,unsigned>( sample,1 ) );
     else
         ++(it->second);
 }
@@ -47,16 +49,15 @@ void Hister<T>::addSampleFile(std::string filename)
     infile.open( filename.c_str() );
 
     T Sample;
-    while ( (infile >> Sample).good() )
-    {
+    while ( infile >> Sample )
         add(Sample);
-    }
+    
     infile.close();
 }
 
 
 template <typename T>
-void Hister<T>::addHist(T data, int freq)
+void Hister<T>::addHist(T data, unsigned freq)
 {
     auto it = hist.find( data );
     if ( it == hist.end() )
@@ -72,8 +73,8 @@ void Hister<T>::addHistFile(std::string filename)
     infile.open( filename.c_str() );
 
     T data;
-    int freq;
-    while ( (infile >> data).good() )
+    unsigned freq;
+    while ( infile >> data )
     {
         infile >> freq;
         addHist(data,freq);

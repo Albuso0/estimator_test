@@ -6,7 +6,7 @@
 #include "support.h"
 #include "mathmore.h"
 #include "commandline.h"
-#include "histreader.h"
+#include "hister.h"
 
 #include <dirent.h>
 #include <random>
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
     {
         DIR *pDIR;
         struct dirent *entry;
-        if( pDIR=opendir(dirname.c_str()) )
+        if( (pDIR=opendir(dirname.c_str())) )
         {
-            while(entry = readdir(pDIR)){
+            while( (entry = readdir(pDIR)) ){
                 if( strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 )
                     files.push_back( std::string(entry->d_name) );
             }
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     
 	
-    HistReader hist;
+    Hister<std::string> hist;
     printf("pmin value in estimator\t=%.2e\n", support.getPmin());
     printf("Degree of polynomial\t=%d\n", support.getDegree());
     printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         {
             auto name = files[ distribution(generator) ];
             // auto name = files[ n_step*i + j ];
-            hist.addHist(dirname+name);
+            hist.addHistFile(dirname+name);
         }
         
         support.setHist( hist.getHist() );
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         std::cout<<freq<<" "<<cnt<<" "<<gL<<" "<<1.0*cnt*gL<<" "<<"\n";
     }
     int cnt = 0;
-    for (int i = cutoff; i<fin.size(); ++i)
+    for (size_t i = cutoff; i<fin.size(); ++i)
         cnt += fin[i].second;
     std::cout<<cnt<<"\n";
 

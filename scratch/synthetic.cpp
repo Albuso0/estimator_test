@@ -13,11 +13,11 @@
 
 int main(int argc, char *argv[])
 {
-    double pmin = 1.0/200;
+    double pmin = 1.0/1e6;
     double cL = 0.56, cp = 0.5;
     int exp = 0;
     int trials = 50;
-    int n_step = 20, n_cnt = 20;
+    int n_step = 50000, n_cnt = 20;
     std::CommandLine cmd;
     cmd.AddValue ("pmin",  "pmin", pmin);
     cmd.AddValue ("cL",  "L=cL log k", cL);
@@ -27,31 +27,56 @@ int main(int argc, char *argv[])
     cmd.Parse (argc, argv);
 
     Support support( pmin ); // set pmin
-    support.setInterval( cL*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
-    support.setDegree( cp*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
+    support.setDegree(8);
+    // support.setInterval( cL*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
+    // support.setDegree( cp*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
 
     
     std::vector<double> p;
+
     switch(exp)
     {
     case 0:
-        p = uniform(200);
+        p = uniform(1000000);
         break;
     case 1:
-        p = mix(100);
+        p = mix(500000);
         break;
     case 2:
-        p = zipf(45);
+        p = zipf(83928);
         break;
     case 3:
-        p = zipfd5(107);
+        p = zipfd5(500516);
         break;
     case 4:
-        p = mixgeozipf(51);
+        p = mixgeozipf(88677);
         break;
     default:
         break;
     }
+
+    // switch(exp)
+    // {
+    // case 0:
+    //     p = uniform(200);
+    //     break;
+    // case 1:
+    //     p = mix(100);
+    //     break;
+    // case 2:
+    //     p = zipf(45);
+    //     break;
+    // case 3:
+    //     p = zipfd5(107);
+    //     break;
+    // case 4:
+    //     p = mixgeozipf(51);
+    //     break;
+    // default:
+    //     break;
+    // }
+    
+    
     // pmin = min_positive_normalized(p);
     // std::cout<<pmin<<std::endl;
     int truth = cnt_positive(p);
@@ -67,7 +92,7 @@ int main(int argc, char *argv[])
     SampleGen gen;
     for ( int seed = 0; seed < trials; ++seed )
     {
-        gen.reset();
+        gen.resetHist();
         gen.setSeed( seed );
         for ( int i = 0; i < n_cnt; i++)
         {

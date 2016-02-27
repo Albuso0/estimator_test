@@ -17,11 +17,11 @@ public:
     void reset(){ resetHist(); }
     void setSeed( int seed ){ generator.seed( seed ); }
 
-    unsigned long linesTotal() const { return lines.size(); }
+    size_t linesTotal() const { return lines.size(); }
     unsigned long distinctTotal() const;
     
     void readAll();                                             // read the whole file
-    void randread( unsigned long long N );                      // randomly read N lines in the file
+    void randread( unsigned long N );                      // randomly read N lines in the file
     /* Inherit from Hister<std::string>:
        public:
        std::vector<int> getHist() const;             // return histogram

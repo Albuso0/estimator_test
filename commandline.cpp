@@ -1,5 +1,7 @@
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
+#include <cstdio>
 #include "commandline.h"
 
 namespace std
@@ -35,6 +37,12 @@ namespace std
 				name = param.substr (0, cur);
 				value = param.substr (cur + 1, param.size () - (cur+1));
 			}
+                        if (name == "PrintHelp" || name == "help" || name == "h")
+                        {
+                            // method below never returns.
+                            PrintHelp (std::cout);
+                            exit (0);
+                        } 
 			// read value
 			for (Items::const_iterator i = m_items.begin (); i != m_items.end (); ++i)
 			{
@@ -44,7 +52,7 @@ namespace std
 					{
 						std::cerr << "Invalid argument value: "<< name << "=" << value << std::endl;
 						PrintHelp (std::cerr);
-						std::exit (1);
+						exit (1);
 					}
 				}
 			}

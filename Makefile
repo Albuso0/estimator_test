@@ -4,13 +4,13 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -std=c++14 # -Wextra -pedantic
-CFLAGS        = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
-CXXFLAGS      = -pipe -O2 -D_REENTRANT -Wall -W -fPIE $(DEFINES)
+DEFINES       = -std=c++14
+CFLAGS        = -O2 -Wall $(DEFINES)
+CXXFLAGS      = -O2 -Wall $(DEFINES)
 INCPATH       = -I.
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) -lpthread 
+LIBS          = $(SUBLIBS) 
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -40,7 +40,7 @@ SOURCES       =
 OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	fileofflinelinereader.o	stringop.o	samplegen.o	commandline.o	entropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = entropy		support
+TARGET        = support
 
 
 first: all
@@ -67,10 +67,10 @@ first: all
 
 all: $(TARGET)
 
-entropy: entropy.o samplegen.o commandline.o mainentropy.o
-	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
+# entropy: entropy.o samplegen.o commandline.o mainentropy.o
+# 	$(LINK) $(LFLAGS) entropy.o samplegen.o mainentropy.o commandline.o $(LIBS) -o entropy
 
-support: $(OBJECTS)
+support: $(OBJECTS) main.o
 	$(LINK) $(LFLAGS) main.o $(OBJECTS) $(LIBS) -o support
 
 # $(TARGET):  $(OBJECTS)  

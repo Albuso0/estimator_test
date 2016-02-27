@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <set>
+#include <random>
 
 void FileOfflineLineReader::addLine(const std::string &line)
 {
@@ -19,13 +20,12 @@ void FileOfflineLineReader::readAll()
     for ( const auto & line:lines)
         addLine(line);
 }
-void FileOfflineLineReader::randread(unsigned long long N)
+void FileOfflineLineReader::randread(unsigned long N)
 {
     std::uniform_int_distribution<int> uniform(0,lines.size()-1);
-    for (unsigned long long i = 0; i < N; i++)
+    for (unsigned long i = 0; i < N; i++)
         addLine(lines[uniform(generator)]);
 }
-
 /* --------------- END IMPLEMENTATIAON OF READ ----------------*/
 
 

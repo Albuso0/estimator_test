@@ -9,7 +9,7 @@
 #include "samplegen.h"
 #include "fileofflinereader.h"
 
-
+#include <climits>
 
 int main(int argc, char *argv[])
 {

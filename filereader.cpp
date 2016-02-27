@@ -1,17 +1,8 @@
 #include <iostream>
 #include <iterator>
 #include <set>
+#include <string>
 #include "filereader.h"
-
-
-void FileReader::addWord(std::string word)
-{
-    auto it = hist.find( word );
-    if ( it == hist.end() )
-        hist.insert( std::pair<std::string,int>( word,1 ) );
-    else
-        ++(it->second);
-}
 
 
 /* -------------------- READ FILE -----------------------*/
@@ -20,31 +11,13 @@ void FileReader::read(unsigned long long N)
     std::string word;
     for ( unsigned long long i = 0; i < N;  ++i )
     {
-        if ( (infile >> word).good() )
-            addWord(word);
+        if ( infile >> word )
+            addSample(word);
         else
             break;
     }
 }
 /* -------------------- END READ FILE -----------------------*/
-
-
-std::vector<int> FileReader::getHist() const
-{
-    std::vector<int> out_hist;
-    for ( const auto & pair : hist )
-        out_hist.push_back( pair.second );
-    return out_hist;
-}
-
-
-unsigned long long FileReader::wordN()
-{
-    unsigned long long sum = 0;
-    for ( const auto & pair : hist )
-        sum += pair.second;
-    return sum;	
-}
 
 
 

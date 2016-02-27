@@ -1,7 +1,6 @@
 #ifndef HISTER_H
 #define HISTER_H
 
-#include <cstdlib>
 #include <vector>
 #include <string>
 #include <map>
@@ -12,23 +11,22 @@ class Hister
 public:
     Hister(){}
     virtual ~Hister(){}
-
-    std::vector<int> getHist() const;             // return histogram
+    
+    std::vector<unsigned> getHist() const;             // return histogram
     void printHist() const;
 
-    std::size_t samplesN() const; // the number of words that have been read
-    std::size_t distinctN() const { return hist.size(); }
-
-protected:
+    unsigned samplesN() const; // the number of words that have been read
+    size_t distinctN() const { return hist.size(); }
+    
     void resetHist(){ hist.clear(); }
+    void addSampleFile(std::string filename);
+    void addHistFile(std::string filename);
+protected:
 	
-    std::map<std::string, int> hist;
+    std::map<T, unsigned> hist;
     
     void addSample(T sample);
-    void addSampleFile(std::string filename);
-    
-    void addHist(T data, int freq);
-    void addHistFile(std::string filename);
+    void addHist(T data, unsigned freq);
 };
 
 
