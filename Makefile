@@ -37,7 +37,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	fileofflinelinereader.o	stringop.o	samplegen.o	commandline.o	entropy.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	support.o	mathmore.o 	fileofflinereader.o 	fileofflinelinereader.o	samplegen.o	commandline.o	entropy.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -105,9 +105,6 @@ fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h hister.h hister.t
 
 fileofflinelinereader.o: fileofflinelinereader.cpp fileofflinelinereader.h hister.h hister.tpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fileofflinelinereader.o fileofflinelinereader.cpp
-
-stringop.o: stringop.cpp stringop.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stringop.o stringop.cpp
 
 samplegen.o: samplegen.cpp samplegen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o samplegen.o samplegen.cpp
