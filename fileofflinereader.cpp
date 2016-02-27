@@ -9,24 +9,24 @@
 /* --------------- IMPLEMENTATIAON OF READ ----------------*/
 void FileOfflineReader::readAll()
 {
-    for ( const auto & word:words)
-        addSample(word);
+    for ( const auto & word:d_words)
+        d_hist.addSample(word);
 }
-void FileOfflineReader::randread(unsigned long long N)
+void FileOfflineReader::randread(unsigned N)
 {
-    std::uniform_int_distribution<int> uniform(0,words.size()-1);
-    for ( unsigned long long i = 0; i < N;  ++i )
-        addSample(words[uniform(generator)]);
+    std::uniform_int_distribution<int> uniform(0,d_words.size()-1);
+    for ( unsigned i = 0; i < N;  ++i )
+        d_hist.addSample(d_words[uniform(d_generator)]);
 }
 
-void FileOfflineReader::read(unsigned long long N)
+void FileOfflineReader::read(unsigned N)
 {
-    for ( unsigned long long i = 0; i < N;  ++i )
+    for ( unsigned i = 0; i < N;  ++i )
     {
-        if ( pos < words.size() )
+        if ( d_pos < d_words.size() )
         {
-            addSample(words[pos]);
-            ++pos;
+            d_hist.addSample(d_words[d_pos]);
+            ++d_pos;
         }
         else
         {
@@ -35,11 +35,11 @@ void FileOfflineReader::read(unsigned long long N)
     }
 }
 
-void FileOfflineReader::read( const std::vector<unsigned long long> &PosVec )
+void FileOfflineReader::read( const std::vector<unsigned> &PosVec )
 {
     for ( const auto & index:PosVec )
-        if ( index < words.size() )
-            addSample(words[index]);
+        if ( index < d_words.size() )
+            d_hist.addSample(d_words[index]);
 }
 /* --------------- END IMPLEMENTATIAON OF READ ----------------*/
 
@@ -54,15 +54,15 @@ FileOfflineReader::FileOfflineReader(std::string filename)
 
     std::string str_in;
     while ( infile >> str_in )
-        words.push_back(str_in);
+        d_words.push_back(str_in);
     
     infile.close();
 }
 
-unsigned long long FileOfflineReader::distinctTotal() const
+size_t FileOfflineReader::distinctTotal() const
 {
     std::set<std::string> wordset;
-    for ( const auto & x:words )
+    for ( const auto & x:d_words )
         wordset.insert( x );
     return wordset.size();
 }

@@ -14,22 +14,18 @@
 int main(int argc, char *argv[])
 {
     double pmin = 1.0/1e6;
-    double cL = 0.56, cp = 0.5;
     int exp = 0;
     int trials = 50;
-    int n_step = 50000, n_cnt = 20;
+    unsigned n_step = 50000, n_cnt = 20;
     std::CommandLine cmd;
     cmd.AddValue ("pmin",  "pmin", pmin);
-    cmd.AddValue ("cL",  "L=cL log k", cL);
-    cmd.AddValue ("cp",  "rEnd=cp log k/n", cp);
     cmd.AddValue ("exp",  "experiment type", exp);
     cmd.AddValue ("trials",  "number of trials", trials);
     cmd.Parse (argc, argv);
 
     Support support( pmin ); // set pmin
-    support.setDegree(8);
-    // support.setInterval( cL*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
-    // support.setDegree( cp*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
+    // support.setDegree( 0.45*log(1.0/pmin)); // Polynomial degree. Plug-in if N>L
+    // support.setInterval( 0.5*log(1.0/pmin) ); // Approximation interval is [1/k, interval/n ]
 
     
     std::vector<double> p;
@@ -90,7 +86,7 @@ int main(int argc, char *argv[])
 
     std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
     SampleGen gen;
-    for ( int seed = 0; seed < trials; ++seed )
+    for ( int seed = 1; seed <= trials; ++seed )
     {
         gen.resetHist();
         gen.setSeed( seed );

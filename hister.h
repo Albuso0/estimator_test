@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <cstdlib>
 
 template<typename T>
 class Hister
@@ -12,21 +13,21 @@ public:
     Hister(){}
     virtual ~Hister(){}
     
+    
+    void reset(){ hist.clear(); }
+    void addSample(T sample);
+    void addSampleFile(std::string filename);
+    void addHist(T data, unsigned freq);
+    void addHistFile(std::string filename);
+
+    
     std::vector<unsigned> getHist() const;             // return histogram
     void printHist() const;
-
     unsigned samplesN() const; // the number of words that have been read
     size_t distinctN() const { return hist.size(); }
     
-    void resetHist(){ hist.clear(); }
-    void addSampleFile(std::string filename);
-    void addHistFile(std::string filename);
-protected:
-	
+private:
     std::map<T, unsigned> hist;
-    
-    void addSample(T sample);
-    void addHist(T data, unsigned freq);
 };
 
 

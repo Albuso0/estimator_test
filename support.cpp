@@ -205,7 +205,7 @@ Support::Support(double p_min)
     :Support()
 {
     pmin = p_min;
-    setDegree( 0.56*log(1.0/pmin) );      // Default L = 0.56 * log(k), where k = 1/pmin
+    setDegree( 0.45*log(1.0/pmin) );      // Default L = 0.56 * log(k), where k = 1/pmin
     setInterval( 0.5*log(1.0/pmin) );     // Default interval [1/k, 0.5*log(k)/n], where k = 1/pmin
 }
 

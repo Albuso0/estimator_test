@@ -6,13 +6,13 @@
 
 
 /* -------------------- READ FILE -----------------------*/
-void FileReader::read(unsigned long long N)
+void FileReader::read(unsigned N)
 {
     std::string word;
-    for ( unsigned long long i = 0; i < N;  ++i )
+    for ( unsigned i = 0; i < N;  ++i )
     {
-        if ( infile >> word )
-            addSample(word);
+        if ( d_infile >> word )
+            d_hist.addSample(word);
         else
             break;
     }
@@ -21,56 +21,56 @@ void FileReader::read(unsigned long long N)
 
 
 
-unsigned long long FileReader::distinctTotal()
+unsigned FileReader::distinctTotal()
 {
-    saveState();
-    resetState();
-    std::istream_iterator<std::string> in(infile), end;
+    saveFileState();
+    resetFileState();
+    std::istream_iterator<std::string> in(d_infile), end;
     std::set<std::string> words;
     for (; in != end; ++in)
     {
         words.insert(*in);
     }
-    loadState();
+    loadFileState();
     return words.size();
 }
 
-unsigned long long FileReader::wordTotal()
+unsigned FileReader::wordTotal()
 {
-    saveState();
-    resetState();
-    std::istream_iterator<std::string> in(infile), end;
-    int count = std::distance(in, end);
-    loadState();
+    saveFileState();
+    resetFileState();
+    std::istream_iterator<std::string> in(d_infile), end;
+    unsigned count = std::distance(in, end);
+    loadFileState();
 	
     return count;
 }
 
-void FileReader::saveState()
+void FileReader::saveFileState()
 {
-    fState = infile.rdstate();
-    fPos = infile.tellg();
+    d_fState = d_infile.rdstate();
+    d_fPos = d_infile.tellg();
 }
-void FileReader::resetState()
+void FileReader::resetFileState()
 {
-    infile.clear();
-    infile.seekg(0);
+    d_infile.clear();
+    d_infile.seekg(0);
 }
-void FileReader::loadState()
+void FileReader::loadFileState()
 {
-    infile.clear( (std::ios_base::iostate)fState );
-    infile.seekg(fPos);
+    d_infile.clear( (std::ios_base::iostate)d_fState );
+    d_infile.seekg(d_fPos);
 }
 
 
 FileReader::FileReader(std::string filename)
     :FileReader()
 {
-    infile.open( filename.c_str() );
+    d_infile.open( filename.c_str() );
 }
 
 FileReader::~FileReader()
 {
-    infile.close();
+    d_infile.close();
 }
 

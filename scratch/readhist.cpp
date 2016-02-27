@@ -7,6 +7,7 @@
 #include "mathmore.h"
 #include "commandline.h"
 #include "hister.h"
+#include <cstring>
 
 #include <dirent.h>
 #include <random>

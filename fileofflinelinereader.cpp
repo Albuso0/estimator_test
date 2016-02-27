@@ -11,20 +11,20 @@ void FileOfflineLineReader::addLine(const std::string &line)
     std::istringstream iss(line);
     std::string word;
     while ( iss >> word )
-        addSample(word);
+        d_hist.addSample(word);
 }
 
 /* --------------- IMPLEMENTATIAON OF READ ----------------*/
 void FileOfflineLineReader::readAll()
 {
-    for ( const auto & line:lines)
+    for ( const auto & line:d_lines)
         addLine(line);
 }
-void FileOfflineLineReader::randread(unsigned long N)
+void FileOfflineLineReader::randread(unsigned N)
 {
-    std::uniform_int_distribution<int> uniform(0,lines.size()-1);
-    for (unsigned long i = 0; i < N; i++)
-        addLine(lines[uniform(generator)]);
+    std::uniform_int_distribution<int> uniform(0, d_lines.size()-1);
+    for (unsigned i = 0; i < N; i++)
+        addLine(d_lines[uniform(d_generator)]);
 }
 /* --------------- END IMPLEMENTATIAON OF READ ----------------*/
 
@@ -38,17 +38,17 @@ FileOfflineLineReader::FileOfflineLineReader(std::string filename)
 
     std::string line;
     while ( std::getline(infile, line) )
-        lines.push_back(line);
+        d_lines.push_back(line);
     
     infile.close();
     
 }
 
 
-unsigned long FileOfflineLineReader::distinctTotal() const
+size_t FileOfflineLineReader::distinctTotal() const
 {
     std::set<std::string> wordset;
-    for ( const auto &line:lines )
+    for ( const auto &line:d_lines )
     {
         std::istringstream iss(line);
         std::string word;

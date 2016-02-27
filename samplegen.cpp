@@ -1,11 +1,12 @@
+// samplegen.cpp
 #include "samplegen.h"
 #include <random>
 #include <vector>
 
-void SampleGen::discrete(int n, const std::vector<double> &p)
+void SampleGen::discrete(unsigned n, const std::vector<double> &p)
 {
-    std::discrete_distribution<int> distribution ( p.begin(),p.end() );
-    for (int i=0; i<n; ++i)
-        addSample( distribution(generator) );
+    std::discrete_distribution<unsigned> distribution ( p.begin(),p.end() );
+    for (unsigned i=0; i<n; ++i)
+        d_hist.addSample( distribution(d_generator) );
 }
 
