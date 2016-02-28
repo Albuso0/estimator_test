@@ -5,10 +5,6 @@
 #include "mathmore.h"
 #include "commandline.h"
 
-#include "distvec.h"
-#include "samplegen.h"
-#include "fileofflinereader.h"
-
 #include <climits>
 
 int main(int argc, char *argv[])

@@ -7,10 +7,10 @@ CXX           = g++
 DEFINES       = -std=c++14
 CFLAGS        = -O2 -Wall $(DEFINES)
 CXXFLAGS      = -O2 -Wall $(DEFINES)
-INCPATH       = -I. -I./sample/
+INCPATH       = -I.
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) ./sample/libSample.a
+LIBS          = $(SUBLIBS) 
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -37,10 +37,10 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = support.o	mathmore.o	commandline.o	## TODO: add all corresponding .o files here
+OBJECTS       = filereader.o	fileofflinereader.o 	fileofflinelinereader.o	samplegen.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
-TARGET        = support
+TARGET        = libsample.a
 
 
 first: all
@@ -67,8 +67,8 @@ first: all
 
 all: $(TARGET)
 
-support: $(OBJECTS) main.o
-	$(LINK) $(LFLAGS) main.o $(OBJECTS) $(LIBS) -o support
+libsample.a: $(OBJECTS) 
+	$(AR) $@ $?
 
 # $(TARGET):  $(OBJECTS)  
 # 	$(LINK) $(LFLAGS) $(OBJECTS) $(OBJCOMP) $(LIBS) -o $(TARGET)
@@ -94,20 +94,14 @@ compiler_clean:
 
 # TODO: add all dependencies for the .o
 
+filereader.o: filereader.cpp filereader.h hister.h hister.tpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
+fileofflinereader.o: fileofflinereader.cpp fileofflinereader.h hister.h hister.tpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
+fileofflinelinereader.o: fileofflinelinereader.cpp fileofflinelinereader.h hister.h hister.tpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
-commandline.o: commandline.cpp commandline.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o commandline.o commandline.cpp
-
-support.o: support.cpp support.h mathmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o support.o support.cpp
-
-mathmore.o: mathmore.cpp mathmore.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
-
-entropy.o: entropy.cpp entropy.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
-
-main.o: main.cpp support.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
+samplegen.o: samplegen.cpp samplegen.h hister.h hister.tpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
