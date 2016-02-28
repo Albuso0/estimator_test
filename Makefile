@@ -10,7 +10,7 @@ CXXFLAGS      = -O2 -Wall $(DEFINES)
 INCPATH       = -I. -I./sample/
 LINK          = g++
 LFLAGS        = -Wl,-O1
-LIBS          = $(SUBLIBS) ./sample/libSample.a
+LIBS          = $(SUBLIBS) -L./sample -lsample
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -105,9 +105,6 @@ support.o: support.cpp support.h mathmore.h
 
 mathmore.o: mathmore.cpp mathmore.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
-
-entropy.o: entropy.cpp entropy.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o entropy.o entropy.cpp
 
 main.o: main.cpp support.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
