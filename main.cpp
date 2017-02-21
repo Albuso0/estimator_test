@@ -6,6 +6,7 @@
 #include "commandline.h"
 
 #include <climits>
+#include <cmath>
 
 int main(int argc, char *argv[])
 {

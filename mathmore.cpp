@@ -1,6 +1,7 @@
 #include "mathmore.h"
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 #include <iostream>
 #include <limits>
 

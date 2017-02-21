@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
     printf("Degree of polynomial\t=%d\n", support.getDegree());
     printf("Approximation interval\t=[%.2e,%.2f/n]\n", support.getPmin(), support.getInterval());
     printf("Number of trials\t=%d\n", trials);
-    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\n");
+    printf("Sample\tTruth\tPlug-in(mean, stdev, rmse)\tPolynomial(mean, stdev, rmse)\tTuring-Good(mean, stdev, rmse)\tChao-Lee1(mean, stdev, rmse)\tChao-Lee2(mean, stdev, rmse)\tChao1(mean, stdev, rmse)\n");
 
-    std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt);
+    std::vector< std::vector<int> > plug(n_cnt), poly(n_cnt), TG(n_cnt), CL1(n_cnt), CL2(n_cnt), J1(n_cnt), Chao1(n_cnt);
     SampleGen gen;
     for ( int seed = 1; seed <= trials; ++seed )
     {
@@ -100,6 +100,7 @@ int main(int argc, char *argv[])
             CL1[i].push_back( (int)support.estimate_CL1() );
             CL2[i].push_back( (int)support.estimate_CL2() );
             J1[i].push_back( (int)support.estimate_J1() );
+            Chao1[i].push_back( (int)support.estimate_Chao1() );
         }
     }
 
@@ -107,13 +108,14 @@ int main(int argc, char *argv[])
     for ( int i = 0; i < n_cnt; i++)
     {
         n += n_step;
-        printf("%d\t%d\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  \n", 
+        printf("%d\t%d\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  %.1f %.2e %.2e\t  \n", 
                n, truth,
                mean(plug[i]), stdev(plug[i]), rmse(plug[i], truth),
                mean(poly[i]), stdev(poly[i]), rmse(poly[i], truth),
                mean(TG[i]), stdev(TG[i]), rmse(TG[i], truth),
                mean(CL1[i]), stdev(CL1[i]), rmse(CL1[i], truth),
-               mean(CL2[i]), stdev(CL2[i]), rmse(CL2[i], truth)
+               mean(CL2[i]), stdev(CL2[i]), rmse(CL2[i], truth),
+               mean(Chao1[i]), stdev(Chao1[i]), rmse(Chao1[i], truth)
             );
     }
 

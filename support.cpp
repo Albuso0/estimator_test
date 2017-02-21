@@ -89,6 +89,26 @@ double Support::estimate_J1() const
 }
 
 
+double Support::estimate_Chao1() const 
+{
+    double f1 = 0;
+    double f2 = 0;
+    for ( const auto & pair : fin )
+        if ( pair.first == 1 )
+        {
+            f1 = pair.second;
+            break;
+        }
+    for ( const auto & pair : fin )
+        if ( pair.first == 2 )
+        {
+            f2 = pair.second;
+            break;
+        }
+    return estimate_plug()+f1*(f1-1)/(2*(f2+1));
+}
+
+
 double Support::estimate_CL1() const // for small coefficient of variation
 {
     double N1 = estimate_TG();

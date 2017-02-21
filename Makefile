@@ -37,7 +37,7 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = 
-OBJECTS       = support.o	mathmore.o	commandline.o	## TODO: add all corresponding .o files here
+OBJECTS       = support.o	mathmore.o	commandline.o	finop.o		distinct.o	## TODO: add all corresponding .o files here
 DIST          =
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = support
@@ -105,6 +105,12 @@ support.o: support.cpp support.h mathmore.h
 
 mathmore.o: mathmore.cpp mathmore.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathmore.o mathmore.cpp
+
+finop.o: finop.cpp finop.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o finop.o finop.cpp
+
+distinct.o: distinct.cpp distinct.h finop.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o distinct.o distinct.cpp
 
 main.o: main.cpp support.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp

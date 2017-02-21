@@ -22,6 +22,7 @@ public:
     double coverage_TG() const;    // Turing-Good coverage
     double estimate_TG() const;    // Turing-Good estimator
     double estimate_J1() const;    // First order Jackknife
+    double estimate_Chao1() const;   // Chao 1
     double estimate_CL1() const;   // Chao-Lee 1
     double estimate_CL2() const;   // Chao-Lee 2
     // Old estimators
